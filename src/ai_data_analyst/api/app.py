@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from ai_data_analyst.api.routes import analysis, system
 from ai_data_analyst.config import get_settings
@@ -25,6 +26,11 @@ def create_app() -> FastAPI:
     )
     app.include_router(system.router)
     app.include_router(analysis.router)
+
+    charts_dir = settings.charts_dir
+    charts_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/charts", StaticFiles(directory=str(charts_dir)), name="charts")
+
     return app
 
 
