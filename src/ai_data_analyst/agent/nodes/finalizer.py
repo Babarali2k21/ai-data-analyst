@@ -50,9 +50,7 @@ def make_finalizer_node(llm: BaseChatModel) -> Any:
         )
         content = response.content
         answer = content.strip() if isinstance(content, str) else str(content)
-        activity_msg = (
-                "Finalized answer (with limitations)" if not passed else "Finalized answer"
-            )
+        activity_msg = "Finalized answer (with limitations)" if not passed else "Finalized answer"
         return {
             "answer": answer,
             "activity": [activity_msg],

@@ -71,9 +71,7 @@ def make_python_analyst_node(llm: BaseChatModel, settings: Settings) -> Any:
                 ]
             )
             spec = (
-                spec_obj
-                if isinstance(spec_obj, StatsSpec)
-                else StatsSpec.model_validate(spec_obj)
+                spec_obj if isinstance(spec_obj, StatsSpec) else StatsSpec.model_validate(spec_obj)
             )
             # Allow models that put fences in data_sql
             spec.data_sql = validate_sql(extract_sql(spec.data_sql))
