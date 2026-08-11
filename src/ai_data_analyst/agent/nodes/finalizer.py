@@ -7,7 +7,7 @@ from typing import Any
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from ai_data_analyst.agent.nodes.sql_analyst import preview_query_result
+from ai_data_analyst.agent.formatting import preview_query_result
 from ai_data_analyst.agent.state import AnalystState
 
 FINALIZER_SYSTEM = """\

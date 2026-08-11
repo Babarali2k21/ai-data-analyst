@@ -53,7 +53,7 @@ def test_analysis_agent_success(tmp_path: Path, monkeypatch: object) -> None:
         )
 
     monkeypatch.setattr(
-        "ai_data_analyst.api.routes.analysis.run_analyst_agent",
+        "ai_data_analyst.api.services.analysis.run_analyst_agent",
         fake_agent,
     )
     client = TestClient(create_app())
@@ -92,7 +92,7 @@ def test_analysis_sql_mode(tmp_path: Path, monkeypatch: object) -> None:
             attempts=1,
         )
 
-    monkeypatch.setattr("ai_data_analyst.api.routes.analysis.ask_sql", fake_sql)
+    monkeypatch.setattr("ai_data_analyst.api.services.analysis.ask_sql", fake_sql)
     client = TestClient(create_app())
     response = client.post(
         "/api/v1/analysis",

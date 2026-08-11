@@ -1,4 +1,4 @@
-"""Simple in-memory sliding-window rate limiter."""
+"""Simple in-memory sliding-window rate limiter. Framework-agnostic."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import time
 from collections import defaultdict, deque
 from threading import Lock
 
-from fastapi import HTTPException, Request, status
+from ai_data_analyst.security.errors import RateLimitExceeded
 
 
 class RateLimiter:
@@ -24,18 +24,14 @@ class RateLimiter:
             while bucket and bucket[0] < cutoff:
                 bucket.popleft()
             if len(bucket) >= self.limit:
-                raise HTTPException(
-                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                    detail=(
-                        f"Rate limit exceeded: {self.limit} requests per "
-                        f"{self.window_seconds}s"
-                    ),
+                raise RateLimitExceeded(
+                    f"Rate limit exceeded: {self.limit} requests per "
+                    f"{self.window_seconds}s"
                 )
             bucket.append(now)
 
 
-def client_key(request: Request, api_key: str | None = None) -> str:
+def client_key(*, client_host: str | None, api_key: str | None = None) -> str:
     if api_key:
         return f"key:{api_key[:8]}"
-    client = request.client.host if request.client else "unknown"
-    return f"ip:{client}"
+    return f"ip:{client_host or 'unknown'}"

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from ai_data_analyst.agent.graph import AgentResult
@@ -13,6 +12,7 @@ from ai_data_analyst.api.deps import reset_rate_limiter
 from ai_data_analyst.config import Settings
 from ai_data_analyst.observability.context import RunMetrics, start_run_metrics
 from ai_data_analyst.security.auth import extract_api_key, require_api_key
+from ai_data_analyst.security.errors import AuthenticationError, RateLimitExceeded
 from ai_data_analyst.security.rate_limit import RateLimiter
 
 
@@ -49,8 +49,8 @@ def test_require_api_key_rejects_missing() -> None:
     settings = Settings(api_keys=["secret"])
     try:
         require_api_key(settings)
-        raise AssertionError("expected HTTPException")
-    except HTTPException as exc:
+        raise AssertionError("expected AuthenticationError")
+    except AuthenticationError as exc:
         assert exc.status_code == 401
 
 
@@ -60,8 +60,8 @@ def test_rate_limiter_blocks_after_limit() -> None:
     limiter.check("ip:1")
     try:
         limiter.check("ip:1")
-        raise AssertionError("expected HTTPException")
-    except HTTPException as exc:
+        raise AssertionError("expected RateLimitExceeded")
+    except RateLimitExceeded as exc:
         assert exc.status_code == 429
 
 
@@ -92,7 +92,7 @@ def test_analysis_requires_api_key_header(tmp_path: Path, monkeypatch: object) -
     _patch_settings(monkeypatch, settings)
 
     monkeypatch.setattr(
-        "ai_data_analyst.api.routes.analysis.run_analyst_agent",
+        "ai_data_analyst.api.services.analysis.run_analyst_agent",
         lambda question, **_: AgentResult(question=question, answer="ok", model="m"),
     )
     client = TestClient(create_app())
@@ -117,7 +117,7 @@ def test_analysis_rate_limited(tmp_path: Path, monkeypatch: object) -> None:
     _patch_settings(monkeypatch, settings)
 
     monkeypatch.setattr(
-        "ai_data_analyst.api.routes.analysis.run_analyst_agent",
+        "ai_data_analyst.api.services.analysis.run_analyst_agent",
         lambda question, **_: AgentResult(question=question, answer="ok", model="m"),
     )
     client = TestClient(create_app())

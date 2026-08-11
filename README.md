@@ -67,6 +67,20 @@ Docs: http://127.0.0.1:8000/docs
 - JSON logs with `request_id` / `run_id`, `X-Request-Id` header.
 - Analysis responses include `observability` metrics.
 
+## Architecture (separation of concerns)
+
+| Layer | Package | Responsibility |
+| --- | --- | --- |
+| HTTP | `api/` | Routes, schemas, DI; thin adapters |
+| Application | `api/services/` | Orchestration (mode, timeout, DTO mapping) |
+| Agent | `agent/` | LangGraph planning, critic, recovery |
+| Analyst | `analyst/` | SQL generate → execute → summarize |
+| Tools | `tools/` | SQL, stats, charts (no HTTP) |
+| Data | `data/` | DuckDB + ingest/profile |
+| Cross-cutting | `security/`, `observability/` | Framework-agnostic policies + metrics |
+
+Dependencies flow **down** only: `api` → `agent`/`analyst` → `tools` → `data`.
+
 ## CLI
 
 ```bash

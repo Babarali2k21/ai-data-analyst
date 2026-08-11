@@ -1,4 +1,4 @@
-"""FastAPI application factory."""
+"""FastAPI application factory — composition root."""
 
 from __future__ import annotations
 

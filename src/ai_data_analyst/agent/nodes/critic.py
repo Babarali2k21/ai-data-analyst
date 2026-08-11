@@ -7,7 +7,7 @@ from typing import Any, Literal
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from ai_data_analyst.agent.nodes.sql_analyst import preview_query_result
+from ai_data_analyst.agent.formatting import preview_query_result
 from ai_data_analyst.agent.recovery import CriticVerdict, recovery_guidance, rule_based_critic
 from ai_data_analyst.agent.state import AnalystState
 from ai_data_analyst.config import Settings
