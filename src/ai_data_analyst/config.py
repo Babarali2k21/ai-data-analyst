@@ -1,0 +1,43 @@
+"""Application settings loaded from environment / .env."""
+
+from functools import lru_cache
+from pathlib import Path
+
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Repo root: src/ai_data_analyst/config.py -> parents[2]
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+class Settings(BaseSettings):
+    """Runtime configuration for data layer and (later) the agent."""
+
+    model_config = SettingsConfigDict(
+        env_file=_REPO_ROOT / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    openai_api_key: str = ""
+    llm_model: str = "gpt-4o-mini"
+
+    duckdb_path: Path = Field(default=_REPO_ROOT / "data" / "processed" / "analytics.duckdb")
+    olist_raw_dir: Path = Field(default=_REPO_ROOT / "data" / "raw" / "olist")
+    olist_metadata_dir: Path = Field(default=_REPO_ROOT / "datasets" / "olist")
+
+    @field_validator("duckdb_path", "olist_raw_dir", "olist_metadata_dir", mode="after")
+    @classmethod
+    def _resolve_relative_paths(cls, value: Path) -> Path:
+        if not value.is_absolute():
+            return (_REPO_ROOT / value).resolve()
+        return value
+
+    @property
+    def repo_root(self) -> Path:
+        return _REPO_ROOT
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
