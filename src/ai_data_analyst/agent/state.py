@@ -44,6 +44,8 @@ class AnalystState(TypedDict, total=False):
     recovery_action: str
     recovery_history: Annotated[list[str], operator.add]
     answer: str
+    charts: list[dict[str, Any]]
+    chart_paths: list[str]
     supporting_sql: list[str]
     activity: Annotated[list[str], operator.add]
     iteration: int

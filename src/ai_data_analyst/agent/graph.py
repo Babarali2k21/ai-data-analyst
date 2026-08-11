@@ -16,6 +16,7 @@ from ai_data_analyst.agent.nodes.planner import make_planner_node
 from ai_data_analyst.agent.nodes.python_analyst import make_python_analyst_node
 from ai_data_analyst.agent.nodes.router import route_after_planner, router
 from ai_data_analyst.agent.nodes.sql_analyst import make_sql_analyst_node
+from ai_data_analyst.agent.nodes.visualizer import make_visualizer_node
 from ai_data_analyst.agent.state import AnalystState
 from ai_data_analyst.analyst.context import build_schema_context
 from ai_data_analyst.config import Settings, get_settings
@@ -38,6 +39,8 @@ class AgentResult(BaseModel):
     model: str = ""
     query_result: dict[str, Any] = Field(default_factory=dict)
     python_result: dict[str, Any] = Field(default_factory=dict)
+    charts: list[dict[str, Any]] = Field(default_factory=list)
+    chart_paths: list[str] = Field(default_factory=list)
 
 
 def build_analyst_graph(
@@ -45,7 +48,7 @@ def build_analyst_graph(
     llm: BaseChatModel | None = None,
     settings: Settings | None = None,
 ) -> Any:
-    """Build the planner → router → analysts → critic → finalizer graph."""
+    """Build planner → router → analysts → critic → visualizer → finalizer."""
     settings = settings or get_settings()
     llm = llm or get_chat_model(settings)
 
@@ -55,6 +58,7 @@ def build_analyst_graph(
     graph.add_node("sql_analyst", make_sql_analyst_node(llm, settings))
     graph.add_node("python_analyst", make_python_analyst_node(llm, settings))
     graph.add_node("critic", make_critic_node(llm))
+    graph.add_node("visualizer", make_visualizer_node(llm, settings))
     graph.add_node("finalizer", make_finalizer_node(llm))
 
     graph.add_edge(START, "planner")
@@ -76,9 +80,10 @@ def build_analyst_graph(
             "planner": "planner",
             "sql_analyst": "sql_analyst",
             "python_analyst": "python_analyst",
-            "finalizer": "finalizer",
+            "visualizer": "visualizer",
         },
     )
+    graph.add_edge("visualizer", "finalizer")
     graph.add_edge("finalizer", END)
     return graph.compile()
 
@@ -112,6 +117,8 @@ def run_analyst_agent(
         "sql": "",
         "query_result": {},
         "python_result": {},
+        "charts": [],
+        "chart_paths": [],
         "plan": {},
     }
     final_state = app.invoke(initial)
@@ -132,6 +139,8 @@ def run_analyst_agent(
         model=settings.llm_model,
         query_result=dict(final_state.get("query_result") or {}),
         python_result=dict(final_state.get("python_result") or {}),
+        charts=list(final_state.get("charts") or []),
+        chart_paths=list(final_state.get("chart_paths") or []),
     )
 
 
@@ -166,6 +175,15 @@ def main() -> None:
     if result.python_result:
         print(f"\nStats operation: {result.python_result.get('operation')}")
         print(f"Stats summary: {result.python_result.get('summary')}")
+    if result.charts:
+        print("\nCharts:")
+        for chart in result.charts:
+            print(
+                f"  - type={chart.get('type')} x={chart.get('x')} "
+                f"y={chart.get('y')} title={chart.get('title')!r}"
+            )
+            if chart.get("image_path"):
+                print(f"    image: {chart['image_path']}")
     print("\nAnswer:")
     print(result.answer)
 

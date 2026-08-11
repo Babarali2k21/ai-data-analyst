@@ -30,8 +30,15 @@ class Settings(BaseSettings):
     sql_row_limit: int = 200
     stats_row_limit: int = 5000
     max_agent_iterations: int = 3
+    charts_dir: Path = Field(default=_REPO_ROOT / "data" / "processed" / "charts")
 
-    @field_validator("duckdb_path", "olist_raw_dir", "olist_metadata_dir", mode="after")
+    @field_validator(
+        "duckdb_path",
+        "olist_raw_dir",
+        "olist_metadata_dir",
+        "charts_dir",
+        mode="after",
+    )
     @classmethod
     def _resolve_relative_paths(cls, value: Path) -> Path:
         if not value.is_absolute():

@@ -96,22 +96,22 @@ def make_critic_node(llm: BaseChatModel) -> Any:
 
 def route_after_critic(
     state: AnalystState, settings: Settings
-) -> Literal["planner", "sql_analyst", "python_analyst", "finalizer"]:
-    """Route to direct retry, replan, or finalize based on recovery_action."""
+) -> Literal["planner", "sql_analyst", "python_analyst", "visualizer"]:
+    """Route to direct retry, replan, or visualization/finalize path."""
     if state.get("critic_passed"):
-        return "finalizer"
+        return "visualizer"
 
     iteration = int(state.get("iteration") or 0)
     action = state.get("recovery_action") or "replan"
 
     if action == "accept_partial" or iteration >= settings.max_agent_iterations:
-        return "finalizer"
+        return "visualizer"
 
     # Avoid infinite direct retries: if same action already tried twice, escalate to planner
     history = list(state.get("recovery_history") or [])
     failure = state.get("failure_type") or "tool_error"
     if len(history) >= settings.max_agent_iterations * 2:
-        return "finalizer"
+        return "visualizer"
     if action in {"retry_sql", "retry_python"} and history.count(f"{failure}:{action}") >= 2:
         return "planner"
 
