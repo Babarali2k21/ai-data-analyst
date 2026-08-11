@@ -30,6 +30,7 @@ profile-olist = "ai_data_analyst.data.profiling.profiler:main"
 ask-sql = "ai_data_analyst.analyst.sql_pipeline:main"
 ask-agent = "ai_data_analyst.agent.graph:main"
 eval-olist = "ai_data_analyst.evaluation.runner:main"
+serve-api = "ai_data_analyst.api.server:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
@@ -37,6 +38,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.0",
     "mypy>=2.3.0",
     "pandas-stubs>=2.3.2",
     "pytest>=9.1.1",

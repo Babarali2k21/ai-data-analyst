@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test ingest profile ask ask-agent eval
+.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api
 
 install:
 	uv sync --all-groups
@@ -30,3 +30,6 @@ ask-agent:
 
 eval:
 	uv run eval-olist --mode $(or $(MODE),agent) $(ARGS)
+
+api:
+	uv run serve-api
