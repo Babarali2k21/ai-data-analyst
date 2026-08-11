@@ -1,0 +1,18 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+
+# Data
+data/raw/*
+data/processed/*
+*.duckdb
+*.duckdb.wal
+
+# Keep directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
