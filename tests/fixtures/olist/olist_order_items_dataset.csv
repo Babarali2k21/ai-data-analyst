@@ -1,0 +1,4 @@
+"order_id","order_item_id","product_id","seller_id","shipping_limit_date","price","freight_value"
+o1,1,p1,s1,2017-09-19 09:45:35,58.90,13.29
+o2,1,p2,s1,2017-11-03 09:00:00,100.00,20.00
+o2,2,p1,s2,2017-11-03 09:00:00,58.90,10.00
