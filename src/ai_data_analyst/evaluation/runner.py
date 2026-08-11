@@ -78,9 +78,7 @@ def evaluate_question(
             critic_passed = agent.critic_passed
             iterations = agent.iteration
             charts = len(agent.charts)
-            sql_executed = bool(sql) and not (
-                agent.failure_type == "tool_error" and not answer
-            )
+            sql_executed = bool(sql) and not (agent.failure_type == "tool_error" and not answer)
 
         latency_ms = (time.perf_counter() - started) * 1000
 
