@@ -13,6 +13,12 @@ export default function HomePage() {
         </p>
       </header>
       <AnalystWorkbench />
+      <footer className="site-footer">
+        A product of{" "}
+        <a href="https://codelink.systems" target="_blank" rel="noreferrer">
+          CodeLink Systems
+        </a>
+      </footer>
     </main>
   );
 }

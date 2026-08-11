@@ -13,7 +13,7 @@ data/processed/*
 *.duckdb
 *.duckdb.wal
 
-# Keep directory structure + demo DuckDB for Docker/AWS
+# Keep directory structure + demo DuckDB for Docker
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/processed/charts/

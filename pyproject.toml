@@ -4,8 +4,9 @@ version = "0.1.0"
 description = "Autonomous data analyst agent for the Olist e-commerce dataset (SQL, Python, LangGraph)."
 readme = "README.md"
 authors = [
-    { name = "Babar Ali", email = "148423037+Babarali2k21@users.noreply.github.com" }
+    { name = "CodeLink Systems", email = "security@codelink.systems" }
 ]
+license = { text = "MIT" }
 requires-python = ">=3.12"
 dependencies = [
     "duckdb>=1.5.5",
@@ -30,6 +31,11 @@ ask-sql = "ai_data_analyst.analyst.sql_pipeline:main"
 ask-agent = "ai_data_analyst.agent.graph:main"
 eval-olist = "ai_data_analyst.evaluation.runner:main"
 serve-api = "ai_data_analyst.api.server:main"
+
+[project.urls]
+Homepage = "https://codelink.systems"
+Repository = "https://github.com/Babarali2k21/ai-data-analyst"
+Issues = "https://github.com/Babarali2k21/ai-data-analyst/issues"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

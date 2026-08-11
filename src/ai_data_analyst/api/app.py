@@ -20,7 +20,10 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title="AI Data Analyst API",
-        description="Analyze the Olist e-commerce dataset with SQL, Python stats, and LangGraph.",
+        description=(
+            "Analyze the Olist e-commerce dataset with SQL, Python stats, and LangGraph. "
+            "A product of CodeLink Systems (https://codelink.systems)."
+        ),
         version="0.1.0",
     )
     app.add_middleware(RequestContextMiddleware)

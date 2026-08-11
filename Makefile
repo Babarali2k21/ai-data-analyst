@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web docker-up aws-bootstrap aws-push-image aws-app-runner
+.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web docker-up
 
 install:
 	uv sync --group dev
@@ -39,16 +39,3 @@ web:
 
 docker-up:
 	docker compose up --build
-
-aws-bootstrap:
-	chmod +x scripts/aws-bootstrap.sh
-	./scripts/aws-bootstrap.sh
-
-aws-push-image:
-	chmod +x scripts/aws-push-image.sh
-	./scripts/aws-push-image.sh $(TAG)
-
-aws-app-runner:
-	cd infra/aws && terraform apply -var='create_app_runner=true' -auto-approve
-	@echo "Service URL:" && cd infra/aws && terraform output -raw app_runner_service_url
-	@echo "Set GitHub variable APP_RUNNER_SERVICE_ARN to:" && cd infra/aws && terraform output -raw app_runner_service_arn

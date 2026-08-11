@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     api_rate_limit_per_minute: int = 30
     api_analysis_timeout_seconds: float = 180.0
 
-    # Bundled lightweight DuckDB for Docker / AWS (fixture subset)
+    # Bundled lightweight DuckDB for Docker (fixture subset)
     demo_duckdb_path: Path = Field(
         default=_REPO_ROOT / "data" / "demo" / "analytics.duckdb"
     )

@@ -1,6 +1,8 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–11** are in place (agent + API + Next.js + observability + Docker/AWS).
+Autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — SQL, Python stats, LangGraph agent, FastAPI, and a Next.js workbench.
+
+Built by [CodeLink Systems](https://codelink.systems).
 
 ## Setup
 
@@ -25,24 +27,13 @@ make web
 
 UI flow: **Dataset → Question → Analysis activity → Findings → Charts → Supporting SQL**.
 
-## Docker
+## Deploy with Docker
 
 ```bash
 docker compose up --build   # API :8000 + Next.js :3000
 ```
 
-## AWS
-
-Terraform + CD: [infra/aws/README.md](infra/aws/README.md) and [docs/deploy/README.md](docs/deploy/README.md)
-
-```bash
-aws configure
-make aws-bootstrap      # ECR + Secrets + GitHub OIDC role
-make aws-push-image     # first image to ECR
-make aws-app-runner     # App Runner API
-```
-
-CD workflow: `.github/workflows/cd-aws.yml` (enable with `AWS_CD_ENABLED=true`).
+More detail: [docs/deploy/README.md](docs/deploy/README.md).
 
 ## API
 
@@ -97,8 +88,12 @@ make lint && make typecheck && make test
 cd apps/web && npm run build
 ```
 
-CI: `.github/workflows/ci.yml`. AWS CD: `.github/workflows/cd-aws.yml`.
+CI: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-## What's next
+## Community
 
-Phase 12: interview/demo prep.
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security](SECURITY.md)
+- [Support](SUPPORT.md)
+- License: [MIT](LICENSE)

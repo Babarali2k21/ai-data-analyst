@@ -1,4 +1,4 @@
-"""Tests for demo DuckDB bootstrap (Docker / AWS image)."""
+"""Tests for demo DuckDB bootstrap (Docker image / fixtures)."""
 
 from __future__ import annotations
 
