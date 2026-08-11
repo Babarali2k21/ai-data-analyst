@@ -35,4 +35,4 @@ api:
 	uv run serve-api
 
 web:
-	cd apps/web && npm run dev
+	cd apps/web && npm run dev -- --port 3001

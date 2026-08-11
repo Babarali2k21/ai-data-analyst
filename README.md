@@ -20,7 +20,7 @@ make api
 
 # terminal 2
 make web
-# open http://localhost:3000
+# open http://localhost:3001  (port 3000 is often taken by Grafana)
 ```
 
 UI flow: **Dataset → Question → Analysis activity → Findings → Charts → Supporting SQL**.
