@@ -1,58 +1,48 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–7** are in place, including a 50-question evaluation benchmark.
-
-## Stack
-
-| Component     | Technology                         |
-| ------------- | ---------------------------------- |
-| Language      | Python 3.12                        |
-| Analytical DB | DuckDB                             |
-| LLM           | OpenAI (`gpt-4.1-mini`)            |
-| Agent         | LangGraph                          |
-| Stats         | Pandas structured ops              |
-| Charts        | `ChartSpec` + matplotlib           |
-| Evaluation    | Custom metrics + LLM-as-judge      |
-| Tests         | Pytest                             |
+Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–8** are in place, including a FastAPI backend.
 
 ## Setup
 
 ```bash
 uv sync --all-groups
-cp .env.example .env
+cp .env.example .env   # set OPENAI_API_KEY
 make ingest && make profile
 ```
 
-## Ask
+## API (Phase 8)
+
+```bash
+make api
+# or: uv run serve-api
+```
+
+Endpoints:
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/health` | Liveness + DuckDB readiness |
+| GET | `/api/v1/dataset` | List loaded tables |
+| POST | `/api/v1/analysis` | Run `agent` or `sql` analysis |
+
+Example:
+
+```bash
+curl -s http://127.0.0.1:8000/health | jq
+curl -s http://127.0.0.1:8000/api/v1/dataset | jq
+curl -s http://127.0.0.1:8000/api/v1/analysis \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"How many orders were delivered?","mode":"agent"}' | jq
+```
+
+OpenAPI docs: http://127.0.0.1:8000/docs
+
+## CLI
 
 ```bash
 uv run ask-agent "What are the top 5 product categories by revenue?"
-```
-
-## Evaluate (Phase 7)
-
-50-question suite at `datasets/olist/benchmark.yaml` (easy/medium/hard).
-
-```bash
-# Smoke a couple of easy numeric questions
 uv run eval-olist --mode agent --ids e01 e06 --no-judge
-
-# SQL-only baseline vs full agent
-uv run eval-olist --mode sql --difficulty easy --no-judge
-uv run eval-olist --mode agent --limit 10
-
-# Full suite (uses LLM judge where marked; costs tokens)
-uv run eval-olist --mode agent
 ```
-
-Reports write to `data/processed/eval_<mode>.json` with:
-
-- task completion rate
-- SQL execution accuracy
-- tool-selection accuracy
-- answer accuracy (numeric / contains / judge)
-- hallucination rate (heuristic + judge)
-- average iterations / latency
 
 ## Development
 
@@ -62,4 +52,4 @@ make lint && make typecheck && make test
 
 ## What's next
 
-Phase 8+: FastAPI, Next.js UI, observability/security, Docker/AWS, interview prep.
+Phase 9+: Next.js UI, observability/security, Docker/AWS, interview prep.
