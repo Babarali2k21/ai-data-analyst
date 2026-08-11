@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test ingest profile
+.PHONY: install lint format typecheck test ingest profile ask
 
 install:
 	uv sync --all-groups
@@ -21,3 +21,6 @@ ingest:
 
 profile:
 	uv run profile-olist
+
+ask:
+	uv run ask-sql $(Q)
