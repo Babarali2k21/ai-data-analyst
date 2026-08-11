@@ -6,8 +6,8 @@ export function ActivityList({ steps }: { steps: string[] }) {
   }
   return (
     <ul className="activity">
-      {steps.map((step) => (
-        <li key={step}>
+      {steps.map((step, index) => (
+        <li key={`${index}-${step}`}>
           <span className="check">✓</span>
           <span>{step}</span>
         </li>
