@@ -1,6 +1,6 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–5** are in place: setup, DuckDB, LLM→SQL, LangGraph agent, Python/stats tools, and critic + structured error recovery.
+Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–6** are in place: setup, DuckDB, LLM→SQL, LangGraph agent, Python/stats, critic recovery, and structured visualization.
 
 ## Stack
 
@@ -12,6 +12,7 @@ Production-style autonomous data analyst agent for the [Olist Brazilian e-commer
 | LLM           | OpenAI (`gpt-4.1-mini` default)    |
 | Agent         | LangGraph                          |
 | Stats         | Pandas (structured ops only)       |
+| Charts        | Structured `ChartSpec` + matplotlib|
 | Validation    | Pydantic                           |
 | Tests         | Pytest                             |
 
@@ -26,26 +27,19 @@ make ingest && make profile
 ## Ask via LangGraph agent
 
 ```bash
-uv run ask-agent "How many orders were delivered?"
+uv run ask-agent "What are the top 5 product categories by revenue?"
 uv run ask-agent "What is the correlation between item price and freight_value?"
 ```
 
-Flow: **Planner → Router → SQL/Python analyst → Critic → retry/replan/finalize**.
+Flow: **Planner → Router → SQL/Python → Critic → Visualizer → Finalizer**.
 
-Phase 5 recovery:
-- Rule-based checks for tool/schema/empty failures
-- LLM critic with `failure_type` + `recovery_action`
-- Direct `retry_sql` / `retry_python` without full replan
-- Tool switches (`switch_to_sql` / `switch_to_python`) and replan loops
-- Iteration / retry caps to avoid infinite loops
+Charts are structured JSON (not frontend code), e.g.:
 
-Python analyst: SQL fetch → fixed stats op → NL findings (no arbitrary code execution).
-
-## Phase 2 single-shot SQL
-
-```bash
-uv run ask-sql "How many orders were delivered?"
+```json
+{"type": "bar", "x": "category", "y": "revenue", "title": "Top categories"}
 ```
+
+Optional PNG renders land in `data/processed/charts/`.
 
 ## Development
 
@@ -55,4 +49,4 @@ make lint && make typecheck && make test
 
 ## What's next
 
-Phase 6+: visualization, evaluation, FastAPI, Next.js UI, observability/security, deploy.
+Phase 7+: evaluation framework, FastAPI, Next.js UI, observability/security, deploy.
