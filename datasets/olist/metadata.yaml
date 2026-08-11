@@ -1,0 +1,64 @@
+dataset:
+  id: olist
+  name: Brazilian E-Commerce
+  description: Brazilian e-commerce transactional dataset from Olist
+  domain: ecommerce
+  source: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+  notes: Geolocation table is excluded from v1 ingest (size / limited early demo value).
+
+tables:
+  - name: orders
+    file: olist_orders_dataset.csv
+    primary_key: [order_id]
+    description: One row per order with status and delivery timestamps
+
+  - name: customers
+    file: olist_customers_dataset.csv
+    primary_key: [customer_id]
+    description: Customer identifiers and location (zip / city / state)
+
+  - name: order_items
+    file: olist_order_items_dataset.csv
+    primary_key: [order_id, order_item_id]
+    description: Line items within each order (product, seller, price, freight)
+
+  - name: order_payments
+    file: olist_order_payments_dataset.csv
+    primary_key: [order_id, payment_sequential]
+    description: Payment methods and values per order
+
+  - name: order_reviews
+    file: olist_order_reviews_dataset.csv
+    primary_key: [review_id]
+    description: Customer review scores and optional text
+
+  - name: products
+    file: olist_products_dataset.csv
+    primary_key: [product_id]
+    description: Product category and physical attributes
+
+  - name: sellers
+    file: olist_sellers_dataset.csv
+    primary_key: [seller_id]
+    description: Seller identifiers and location
+
+  - name: product_category_translation
+    file: product_category_name_translation.csv
+    primary_key: [product_category_name]
+    description: Portuguese to English product category names
+
+relationships:
+  - from: orders.customer_id
+    to: customers.customer_id
+  - from: order_items.order_id
+    to: orders.order_id
+  - from: order_items.product_id
+    to: products.product_id
+  - from: order_items.seller_id
+    to: sellers.seller_id
+  - from: order_payments.order_id
+    to: orders.order_id
+  - from: order_reviews.order_id
+    to: orders.order_id
+  - from: products.product_category_name
+    to: product_category_translation.product_category_name
