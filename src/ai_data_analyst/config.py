@@ -32,6 +32,17 @@ class Settings(BaseSettings):
     max_agent_iterations: int = 3
     charts_dir: Path = Field(default=_REPO_ROOT / "data" / "processed" / "charts")
 
+    api_host: str = "0.0.0.0"
+    api_port: int = 8000
+    api_reload: bool = False
+    api_cors_origins: list[str] = Field(
+        default_factory=lambda: [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:5173",
+        ]
+    )
+
     @field_validator(
         "duckdb_path",
         "olist_raw_dir",
