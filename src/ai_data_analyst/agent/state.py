@@ -7,6 +7,16 @@ from typing import Annotated, Any, Literal, TypedDict
 
 from pydantic import BaseModel, Field
 
+from ai_data_analyst.agent.recovery import CriticVerdict, FailureType, RecoveryAction
+
+__all__ = [
+    "AnalysisPlan",
+    "AnalystState",
+    "CriticVerdict",
+    "FailureType",
+    "RecoveryAction",
+]
+
 
 class AnalysisPlan(BaseModel):
     """Planner output: what to do and which tool to use."""
@@ -15,13 +25,6 @@ class AnalysisPlan(BaseModel):
     steps: list[str] = Field(default_factory=list)
     tool: Literal["sql", "python"] = "sql"
     rationale: str = ""
-
-
-class CriticVerdict(BaseModel):
-    """Critic pass/fail decision with actionable feedback."""
-
-    passed: bool
-    feedback: str
 
 
 class AnalystState(TypedDict, total=False):
@@ -37,6 +40,9 @@ class AnalystState(TypedDict, total=False):
     findings: str
     critic_passed: bool
     critic_feedback: str
+    failure_type: str
+    recovery_action: str
+    recovery_history: Annotated[list[str], operator.add]
     answer: str
     supporting_sql: list[str]
     activity: Annotated[list[str], operator.add]
