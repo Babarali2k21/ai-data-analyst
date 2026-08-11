@@ -1,6 +1,6 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–9** are in place (agent + API + Next.js UI).
+Production-style autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–10** are in place (agent + API + Next.js UI + observability/security).
 
 ## Setup
 
@@ -29,12 +29,26 @@ UI flow: **Dataset → Question → Analysis activity → Findings → Charts �
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| GET | `/health` | readiness |
+| GET | `/health` | readiness (`auth_required` when `API_KEYS` set) |
 | GET | `/api/v1/dataset` | tables |
 | POST | `/api/v1/analysis` | `mode: agent \| sql` |
 | GET | `/charts/<file>.png` | rendered chart images |
 
 Docs: http://127.0.0.1:8000/docs
+
+### Security (Phase 10)
+
+- Optional API keys via `API_KEYS` (comma-separated). Send `X-API-Key` or `Authorization: Bearer <key>`. Empty = auth disabled for local demo.
+- In-memory rate limit: `API_RATE_LIMIT_PER_MINUTE` (default 30).
+- Analysis timeout: `API_ANALYSIS_TIMEOUT_SECONDS` (default 180).
+- Existing guards: read-only DuckDB, SQL allowlist, iteration caps, structured stats only (no arbitrary Python).
+
+### Observability (Phase 10)
+
+- JSON structured logs (`LOG_LEVEL`) with `request_id` / `run_id`.
+- `X-Request-Id` response header (echo or generate).
+- Analysis responses include `observability` (latency, SQL/LLM call counts, token estimates).
+- Optional OpenTelemetry FastAPI instrumentation when `opentelemetry-instrumentation-fastapi` is installed.
 
 ## CLI
 
@@ -52,4 +66,4 @@ cd apps/web && npm run build
 
 ## What's next
 
-Phase 10+: observability/security, Docker/AWS, interview prep.
+Phase 11–12: Docker/AWS, interview/demo prep.

@@ -23,6 +23,7 @@ def health(settings: SettingsDep) -> HealthResponse:
         status="ok" if ready else "degraded",
         duckdb_ready=ready,
         model=settings.llm_model,
+        auth_required=bool([k for k in settings.api_keys if k.strip()]),
     )
 
 

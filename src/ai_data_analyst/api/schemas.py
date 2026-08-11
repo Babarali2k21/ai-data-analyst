@@ -12,6 +12,21 @@ class AnalysisRequest(BaseModel):
     mode: Literal["agent", "sql"] = "agent"
 
 
+class ObservabilityInfo(BaseModel):
+    request_id: str | None = None
+    run_id: str | None = None
+    total_latency_ms: float = 0.0
+    sql_calls: int = 0
+    sql_latency_ms: float = 0.0
+    llm_calls: int = 0
+    llm_latency_ms: float = 0.0
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
+    estimated_cost_usd: float = 0.0
+    tool_errors: int = 0
+
+
 class AnalysisResponse(BaseModel):
     question: str
     answer: str
@@ -31,6 +46,7 @@ class AnalysisResponse(BaseModel):
     python_result: dict[str, Any] = Field(default_factory=dict)
     charts: list[dict[str, Any]] = Field(default_factory=list)
     chart_paths: list[str] = Field(default_factory=list)
+    observability: ObservabilityInfo = Field(default_factory=ObservabilityInfo)
 
 
 class HealthResponse(BaseModel):
@@ -38,6 +54,7 @@ class HealthResponse(BaseModel):
     duckdb_ready: bool
     model: str
     dataset: str = "olist"
+    auth_required: bool = False
 
 
 class DatasetInfoResponse(BaseModel):

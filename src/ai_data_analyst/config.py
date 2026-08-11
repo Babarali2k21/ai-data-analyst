@@ -45,6 +45,19 @@ class Settings(BaseSettings):
         ]
     )
 
+    # Phase 10 — security + observability
+    log_level: str = "INFO"
+    api_keys: list[str] = Field(default_factory=list)
+    api_rate_limit_per_minute: int = 30
+    api_analysis_timeout_seconds: float = 180.0
+
+    @field_validator("api_keys", mode="before")
+    @classmethod
+    def _split_api_keys(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [part.strip() for part in value.split(",") if part.strip()]
+        return value
+
     @field_validator(
         "duckdb_path",
         "olist_raw_dir",

@@ -36,6 +36,7 @@ def test_analysis_agent_success(tmp_path: Path, monkeypatch: object) -> None:
     duckdb.write_bytes(b"not-empty")
     settings = _settings(tmp_path, duckdb)
     monkeypatch.setattr("ai_data_analyst.api.deps.get_settings", lambda: settings)
+    monkeypatch.setattr("ai_data_analyst.config.get_settings", lambda: settings)
 
     def fake_agent(question: str, **_kwargs: object) -> AgentResult:
         return AgentResult(
@@ -66,6 +67,8 @@ def test_analysis_agent_success(tmp_path: Path, monkeypatch: object) -> None:
     assert body["mode"] == "agent"
     assert body["critic_passed"] is True
     assert body["charts"]
+    assert body["observability"]["run_id"]
+    assert "X-Request-Id" in response.headers
 
 
 def test_analysis_sql_mode(tmp_path: Path, monkeypatch: object) -> None:
