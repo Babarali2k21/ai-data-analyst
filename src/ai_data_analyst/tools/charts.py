@@ -112,6 +112,9 @@ def chart_from_group_compare(summary: dict[str, Any]) -> ChartSpec | None:
 
 def attach_series(spec: ChartSpec, rows: list[dict[str, Any]], max_points: int = 100) -> ChartSpec:
     """Copy x/y values from rows into the chart series payload."""
+    # Ranked categorical bars stay readable when we cap how many categories we plot.
+    if spec.type == "bar" and max_points > 20:
+        max_points = 20
     series = _series(rows, spec.x, spec.y, max_points=max_points)
     return spec.model_copy(update={"series": series})
 

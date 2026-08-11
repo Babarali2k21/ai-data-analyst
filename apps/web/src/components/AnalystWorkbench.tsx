@@ -166,10 +166,16 @@ export function AnalystWorkbench() {
               : result.sql
                 ? [result.sql]
                 : []
-            ).map((sql) => (
-              <pre className="sql-block" key={sql}>
-                {sql}
-              </pre>
+            ).map((sql, index, list) => (
+              <div className="sql-attempt" key={`${index}-${sql.slice(0, 48)}`}>
+                {list.length > 1 ? (
+                  <p className="muted sql-attempt-label">
+                    Attempt {index + 1}
+                    {index === list.length - 1 ? " (final)" : ""}
+                  </p>
+                ) : null}
+                <pre className="sql-block">{sql}</pre>
+              </div>
             ))}
             {!result.sql && !(result.supporting_sql || []).length ? (
               <p className="muted">No SQL captured.</p>

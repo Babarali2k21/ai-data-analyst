@@ -278,6 +278,19 @@ select {
   display: block;
 }
 
+.sql-attempt {
+  margin-bottom: 1rem;
+}
+
+.sql-attempt:last-child {
+  margin-bottom: 0;
+}
+
+.sql-attempt-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+}
+
 .sql-block {
   margin: 0;
   overflow-x: auto;

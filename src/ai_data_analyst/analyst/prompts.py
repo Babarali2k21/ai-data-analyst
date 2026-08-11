@@ -12,7 +12,8 @@ Rules:
 - Prefer clear column aliases.
 - Limit large result sets with LIMIT when returning many rows (default LIMIT 50 unless the
   question asks for a full list that is naturally small, like a count or top-N).
-- For "top N" questions, ORDER BY the metric DESC and LIMIT N.
+- For "top N" questions, ORDER BY the metric DESC and LIMIT N exactly (never a larger LIMIT).
+- Prefer one complete query that answers the question (include the ranking metric in SELECT).
 """
 
 ANSWER_SYSTEM_PROMPT = """\
