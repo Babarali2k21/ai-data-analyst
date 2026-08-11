@@ -6,6 +6,7 @@ from ai_data_analyst.agent.graph import run_analyst_agent
 from ai_data_analyst.agent.state import AnalysisPlan, CriticVerdict
 from ai_data_analyst.config import Settings
 from ai_data_analyst.data.ingestion.olist import ingest_olist
+from ai_data_analyst.tools.stats import StatsSpec
 
 
 class FakeLLM:
@@ -22,14 +23,20 @@ class FakeLLM:
             def invoke(self, _messages: Any) -> Any:
                 if schema is AnalysisPlan:
                     return AnalysisPlan(
-                        goal="Count orders",
-                        steps=["Query orders table", "Return count"],
+                        goal="Analyze data",
+                        steps=["Fetch data", "Compute metric"],
                         tool=parent.tool,  # type: ignore[arg-type]
-                        rationale="Simple aggregation",
+                        rationale="test",
                     )
                 if schema is CriticVerdict:
-                    # Pass once we have SQL findings; fail python stub path
-                    return CriticVerdict(passed=parent.tool == "sql", feedback="ok")
+                    return CriticVerdict(passed=True, feedback="ok")
+                if schema is StatsSpec:
+                    return StatsSpec(
+                        operation="correlation",
+                        data_sql="SELECT price, freight_value FROM order_items",
+                        columns=["price", "freight_value"],
+                        rationale="correlation of price and freight",
+                    )
                 raise TypeError(f"Unexpected schema {schema}")
 
         return Structured()
@@ -41,7 +48,8 @@ class FakeLLM:
             content = getattr(message, "content", message)
             contents.append(content if isinstance(content, str) else str(content))
         blob = "\n".join(contents).lower()
-        # SQL generation / repair prompts end with "SQL:" and include schema
+        if "stats summary" in blob:
+            return AIMessage(content="Price and freight are positively correlated.")
         if "write a corrected" in blob or blob.rstrip().endswith("sql:"):
             return AIMessage(content="SELECT count(*) AS n FROM orders")
         if "schema:" in blob and "question:" in blob and "result:" not in blob:
@@ -51,7 +59,6 @@ class FakeLLM:
 
 def test_agent_sql_path_with_fake_llm(temp_settings: Settings) -> None:
     ingest_olist(settings=temp_settings)
-    # Keep agent loops small in tests
     temp_settings.max_agent_iterations = 2
     llm = FakeLLM(tool="sql")
     result = run_analyst_agent(
@@ -66,16 +73,17 @@ def test_agent_sql_path_with_fake_llm(temp_settings: Settings) -> None:
     assert result.iteration >= 1
 
 
-def test_agent_python_stub_replans_or_finalizes(temp_settings: Settings) -> None:
+def test_agent_python_stats_path(temp_settings: Settings) -> None:
     ingest_olist(settings=temp_settings)
-    temp_settings.max_agent_iterations = 1
+    temp_settings.max_agent_iterations = 2
     llm = FakeLLM(tool="python")
     result = run_analyst_agent(
-        "Compute correlation of price and freight",
+        "What is the correlation between price and freight_value?",
         settings=temp_settings,
         llm=llm,  # type: ignore[arg-type]
     )
-    # With max_iterations=1, python stub fails critic then finalizer runs
-    assert result.critic_passed is False
-    assert "Python" in result.critic_feedback or result.answer
-    assert any("Python" in step for step in result.activity)
+    assert result.critic_passed is True
+    assert result.python_result.get("operation") == "correlation"
+    assert "matrix" in (result.python_result.get("summary") or {})
+    assert any("statistical analysis" in step.lower() for step in result.activity)
+    assert "correlated" in result.answer.lower() or result.answer
