@@ -39,10 +39,10 @@ export function AnalystWorkbench() {
         }
       } catch (err) {
         if (!cancelled) {
+          const base =
+            process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
           setError(
-            err instanceof Error
-              ? err.message
-              : "Could not reach API. Start it with `make api`.",
+            `Cannot reach API at ${base}. In another terminal run: make api`,
           );
         }
       }
@@ -61,7 +61,14 @@ export function AnalystWorkbench() {
         setResult(response);
       } catch (err) {
         setResult(null);
-        setError(err instanceof Error ? err.message : "Analysis failed");
+        const base =
+          process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+        const message = err instanceof Error ? err.message : "Analysis failed";
+        setError(
+          message === "Failed to fetch"
+            ? `Cannot reach API at ${base}. In another terminal run: make api`
+            : message,
+        );
       }
     });
   }
