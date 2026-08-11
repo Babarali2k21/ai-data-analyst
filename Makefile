@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api
+.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web
 
 install:
 	uv sync --all-groups
@@ -33,3 +33,6 @@ eval:
 
 api:
 	uv run serve-api
+
+web:
+	cd apps/web && npm run dev

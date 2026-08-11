@@ -18,3 +18,8 @@ data/processed/*
 !data/processed/.gitkeep
 !data/processed/charts/
 !data/processed/charts/.gitkeep
+
+# Frontend
+apps/web/node_modules/
+apps/web/.next/
+apps/web/.env.local
