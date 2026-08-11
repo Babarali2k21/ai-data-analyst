@@ -88,6 +88,8 @@ make lint && make typecheck && make test
 cd apps/web && npm run build
 ```
 
+CI runs the same checks on every push/PR (`.github/workflows/ci.yml`).
+
 ## What's next
 
 Phase 12: interview/demo prep.
