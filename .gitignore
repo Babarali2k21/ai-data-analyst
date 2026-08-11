@@ -13,7 +13,7 @@ data/processed/*
 *.duckdb
 *.duckdb.wal
 
-# Keep directory structure + Streamlit demo DB
+# Keep directory structure + demo DuckDB for Docker/AWS
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/processed/charts/
@@ -30,5 +30,6 @@ apps/web/node_modules/
 apps/web/.next/
 apps/web/.env.local
 
-# Streamlit local secrets
-.streamlit/secrets.toml
+# Local / obsolete scaffolding
+.vscode/
+packages/
