@@ -1,0 +1,113 @@
+name: CD AWS
+
+# Builds the API image, pushes to Amazon ECR, and triggers App Runner.
+# Disabled until repository variable AWS_CD_ENABLED=true (avoids red X without AWS).
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - "src/**"
+      - "Dockerfile"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "data/demo/**"
+      - "datasets/**"
+      - "apps/streamlit/**"
+      - "requirements-streamlit.txt"
+      - ".github/workflows/cd-aws.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: cd-aws-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Build → ECR → App Runner
+    runs-on: ubuntu-latest
+    if: ${{ vars.AWS_CD_ENABLED == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve config
+        id: meta
+        run: |
+          REGION="${{ vars.AWS_REGION }}"
+          if [ -z "$REGION" ]; then REGION="eu-central-1"; fi
+          REPO="${{ vars.ECR_REPOSITORY }}"
+          if [ -z "$REPO" ]; then REPO="ai-data-analyst-api"; fi
+          AUTH="${{ vars.AWS_AUTH_MODE }}"
+          if [ -z "$AUTH" ]; then AUTH="oidc"; fi
+          echo "region=$REGION" >> "$GITHUB_OUTPUT"
+          echo "ecr_repo=$REPO" >> "$GITHUB_OUTPUT"
+          echo "auth_mode=$AUTH" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials (OIDC)
+        if: ${{ steps.meta.outputs.auth_mode != 'keys' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ steps.meta.outputs.region }}
+
+      - name: Configure AWS credentials (access keys)
+        if: ${{ steps.meta.outputs.auth_mode == 'keys' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ steps.meta.outputs.region }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Ensure ECR repository exists
+        env:
+          ECR_REPO: ${{ steps.meta.outputs.ecr_repo }}
+        run: |
+          aws ecr describe-repositories --repository-names "$ECR_REPO" >/dev/null 2>&1 \
+            || aws ecr create-repository \
+                 --repository-name "$ECR_REPO" \
+                 --image-scanning-configuration scanOnPush=true \
+                 --encryption-configuration encryptionType=AES256
+
+      - name: Build and push image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          ECR_REPO: ${{ steps.meta.outputs.ecr_repo }}
+          SHA: ${{ github.sha }}
+        run: |
+          IMAGE="$REGISTRY/$ECR_REPO"
+          docker build -t "$IMAGE:$SHA" -t "$IMAGE:latest" .
+          docker push "$IMAGE:$SHA"
+          docker push "$IMAGE:latest"
+          echo "image=$IMAGE:$SHA" >> "$GITHUB_ENV"
+
+      - name: Trigger App Runner deployment
+        if: ${{ vars.APP_RUNNER_SERVICE_ARN != '' }}
+        env:
+          SERVICE_ARN: ${{ vars.APP_RUNNER_SERVICE_ARN }}
+        run: |
+          aws apprunner start-deployment --service-arn "$SERVICE_ARN"
+          echo "Triggered App Runner deployment for $SERVICE_ARN"
+          echo "Image: $image"
+
+      - name: Summary
+        run: |
+          {
+            echo "## AWS CD"
+            echo ""
+            echo "- Region: \`${{ steps.meta.outputs.region }}\`"
+            echo "- Auth: \`${{ steps.meta.outputs.auth_mode }}\`"
+            echo "- Image: \`$image\`"
+            if [ -n "${{ vars.APP_RUNNER_SERVICE_ARN }}" ]; then
+              echo "- App Runner: deployment started"
+            else
+              echo "- App Runner: skipped (set \`APP_RUNNER_SERVICE_ARN\` to auto-deploy)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

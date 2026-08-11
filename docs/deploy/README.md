@@ -52,7 +52,7 @@ Note: Streamlit Cloud disk is ephemeral across restarts, so quotas reset if the 
 
 ### Option A — App Runner (simplest managed container)
 
-1. Build & push the API image:
+1. Build & push the API image (or use GitHub Actions CD below):
 
 ```bash
 aws ecr create-repository --repository-name ai-data-analyst-api
@@ -65,6 +65,64 @@ docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ai-data-analyst-ap
 2. Create an App Runner service from that ECR image.
 3. Set env vars: `OPENAI_API_KEY`, `DUCKDB_PATH=/app/data/demo/analytics.duckdb`, `DEMO_QUERY_LIMIT=3`, `API_KEYS=...`.
 4. Health check path: `/health`.
+
+### Continuous deployment (GitHub Actions → ECR → App Runner)
+
+Workflow: [`.github/workflows/cd-aws.yml`](../.github/workflows/cd-aws.yml).
+
+It is **off by default** so pushes stay green without AWS. Enable it once:
+
+**Repository variables** (Settings → Secrets and variables → Actions → Variables):
+
+| Variable | Example | Purpose |
+| --- | --- | --- |
+| `AWS_CD_ENABLED` | `true` | Turns the CD job on |
+| `AWS_REGION` | `eu-central-1` | AWS region (default `eu-central-1`) |
+| `ECR_REPOSITORY` | `ai-data-analyst-api` | ECR repo name |
+| `AWS_AUTH_MODE` | `oidc` or `keys` | Auth style (default `oidc`) |
+| `APP_RUNNER_SERVICE_ARN` | `arn:aws:apprunner:...:service/...` | Triggers `start-deployment` after push |
+
+**Secrets** (OIDC — recommended, `AWS_AUTH_MODE=oidc` or unset):
+
+| Secret | Purpose |
+| --- | --- |
+| `AWS_ROLE_ARN` | IAM role for GitHub OIDC (`sts:AssumeRoleWithWebIdentity`) |
+
+**Secrets** (access keys — `AWS_AUTH_MODE=keys`):
+
+| Secret | Purpose |
+| --- | --- |
+| `AWS_ACCESS_KEY_ID` | IAM user access key |
+| `AWS_SECRET_ACCESS_KEY` | IAM user secret |
+
+Minimum IAM permissions for the role/user: `ecr:*` on the repo (or the usual push set), plus `apprunner:StartDeployment` on the service.
+
+OIDC trust (GitHub → AWS) sketch:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Federated": "arn:aws:iam::ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com" },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:Babarali2k21/ai-data-analyst:*"
+        }
+      }
+    }
+  ]
+}
+```
+
+After setup, pushes that change the API image (or **Actions → CD AWS → Run workflow**) build, push `:sha` + `:latest`, and redeploy App Runner when `APP_RUNNER_SERVICE_ARN` is set.
+
+If App Runner has **automatic deployments from ECR** enabled, you can leave `APP_RUNNER_SERVICE_ARN` empty and still get CD from the image push alone.
 
 ### Option B — ECS Fargate + ALB
 
@@ -81,4 +139,4 @@ Use the same image as the App Runner task definition, attach an Application Load
 | --- | --- |
 | Streamlit Cloud | Public link for recruiters (3-query cap) |
 | Docker Compose locally | Full API + Next.js walkthrough |
-| AWS App Runner | Optional “I deployed it” talking point |
+| AWS App Runner + CD | Optional “I deployed it” talking point |

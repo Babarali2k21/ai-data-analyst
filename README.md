@@ -89,6 +89,7 @@ cd apps/web && npm run build
 ```
 
 CI runs the same checks on every push/PR (`.github/workflows/ci.yml`).
+AWS CD (ECR → App Runner) is in `.github/workflows/cd-aws.yml` — enable with repo variable `AWS_CD_ENABLED=true` (see [docs/deploy/README.md](docs/deploy/README.md)).
 
 ## What's next
 
