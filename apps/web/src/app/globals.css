@@ -1,0 +1,334 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg: #07131a;
+  --bg-elevated: #0d1f2a;
+  --panel: rgba(14, 36, 48, 0.88);
+  --ink: #e7f2f6;
+  --muted: #8eacb8;
+  --line: rgba(140, 188, 204, 0.22);
+  --accent: #2ec4b6;
+  --accent-2: #f4a261;
+  --danger: #ef6767;
+  --ok: #62d2a2;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  --radius: 18px;
+  --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1000px 500px at 10% -10%, rgba(46, 196, 182, 0.18), transparent 55%),
+    radial-gradient(800px 420px at 90% 0%, rgba(244, 162, 97, 0.12), transparent 50%),
+    linear-gradient(180deg, #061018 0%, #0a1821 45%, #07131a 100%);
+}
+
+body {
+  background-image:
+    linear-gradient(rgba(142, 172, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(142, 172, 184, 0.05) 1px, transparent 1px),
+    radial-gradient(1000px 500px at 10% -10%, rgba(46, 196, 182, 0.18), transparent 55%),
+    radial-gradient(800px 420px at 90% 0%, rgba(244, 162, 97, 0.12), transparent 50%),
+    linear-gradient(180deg, #061018 0%, #0a1821 45%, #07131a 100%);
+  background-size: 28px 28px, 28px 28px, auto, auto, auto;
+}
+
+a {
+  color: var(--accent);
+}
+
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+.shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 3.5rem;
+}
+
+.hero {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.eyebrow {
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 42rem;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.pill strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.pill.ok {
+  border-color: rgba(98, 210, 162, 0.4);
+  color: var(--ok);
+}
+
+.pill.warn {
+  border-color: rgba(244, 162, 97, 0.45);
+  color: var(--accent-2);
+}
+
+.ask-panel {
+  padding: 1.1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.ask-panel label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.ask-panel textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(4, 14, 20, 0.65);
+  color: var(--ink);
+  padding: 0.9rem 1rem;
+}
+
+.ask-panel textarea:focus,
+.ask-panel select:focus,
+.ask-panel button:focus-visible {
+  outline: 2px solid rgba(46, 196, 182, 0.55);
+  outline-offset: 1px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.controls select {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(4, 14, 20, 0.65);
+  color: var(--ink);
+  padding: 0.7rem 0.85rem;
+}
+
+.controls button {
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2ec4b6, #1f9e94);
+  color: #042028;
+  font-weight: 700;
+  padding: 0.75rem 1.15rem;
+  cursor: pointer;
+}
+
+.controls button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.examples button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.examples button:hover {
+  color: var(--ink);
+  border-color: rgba(46, 196, 182, 0.5);
+}
+
+.section {
+  padding: 1.15rem 1.2rem 1.25rem;
+}
+
+.section h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.activity li {
+  display: grid;
+  grid-template-columns: 1.1rem 1fr;
+  gap: 0.55rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.activity .check {
+  color: var(--ok);
+  font-weight: 700;
+}
+
+.findings {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.chart-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.85rem;
+  background: rgba(4, 14, 20, 0.35);
+}
+
+.chart-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.chart-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+}
+
+.sql-block {
+  margin: 0;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #041018;
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #d7ebe8;
+  white-space: pre-wrap;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.error {
+  color: var(--danger);
+  margin: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .shell {
+    width: min(100% - 1.25rem, 1120px);
+    padding-top: 1.25rem;
+  }
+}
