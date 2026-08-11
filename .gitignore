@@ -13,13 +13,22 @@ data/processed/*
 *.duckdb
 *.duckdb.wal
 
-# Keep directory structure
+# Keep directory structure + Streamlit demo DB
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/processed/charts/
 !data/processed/charts/.gitkeep
+!data/demo/
+!data/demo/**
+!data/demo/**/*.duckdb
+data/demo/quota.sqlite
+data/demo/quota.sqlite-*
+data/demo/charts/*
 
 # Frontend
 apps/web/node_modules/
 apps/web/.next/
 apps/web/.env.local
+
+# Streamlit local secrets
+.streamlit/secrets.toml

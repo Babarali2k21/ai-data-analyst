@@ -1,7 +1,7 @@
-.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web
+.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web streamlit docker-up docker-demo
 
 install:
-	uv sync --all-groups
+	uv sync --group dev
 
 lint:
 	uv run ruff check src tests
@@ -36,3 +36,13 @@ api:
 
 web:
 	cd apps/web && npm run dev -- --port 3001
+
+streamlit:
+	uv sync --group dev --group demo
+	uv run streamlit run apps/streamlit/app.py --server.port 8501
+
+docker-up:
+	docker compose up --build
+
+docker-demo:
+	docker compose --profile demo up --build streamlit

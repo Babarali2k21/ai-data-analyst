@@ -1,6 +1,6 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–10** are in place (agent + API + Next.js UI + observability/security).
+Production-style autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–11** are in place (agent + API + Next.js + observability + Docker/Streamlit demo).
 
 ## Setup
 
@@ -24,6 +24,30 @@ make web
 ```
 
 UI flow: **Dataset → Question → Analysis activity → Findings → Charts → Supporting SQL**.
+
+## Live Streamlit demo (3 queries / visitor)
+
+```bash
+make streamlit
+# open http://localhost:8501
+```
+
+Deploy for free on [Streamlit Community Cloud](https://share.streamlit.io):
+
+1. Main file: `apps/streamlit/app.py`
+2. Requirements: `requirements-streamlit.txt`
+3. Secrets: `OPENAI_API_KEY`, `DEMO_QUERY_LIMIT=3` (see `.streamlit/secrets.toml.example`)
+
+Each visitor is capped at **3 queries** (IP + sticky `vid`) so a public link will not burn your OpenAI budget.
+
+Full deploy notes: [docs/deploy/README.md](docs/deploy/README.md).
+
+## Docker
+
+```bash
+docker compose up --build          # API :8000 + Next.js :3000
+docker compose --profile demo up streamlit   # Streamlit :8501
+```
 
 ## API
 
@@ -66,4 +90,4 @@ cd apps/web && npm run build
 
 ## What's next
 
-Phase 11–12: Docker/AWS, interview/demo prep.
+Phase 12: interview/demo prep.

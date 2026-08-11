@@ -1,0 +1,63 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DUCKDB_PATH: /app/data/demo/analytics.duckdb
+      DEMO_DUCKDB_PATH: /app/data/demo/analytics.duckdb
+      CHARTS_DIR: /app/data/runtime/charts
+      DEMO_QUOTA_PATH: /app/data/runtime/quota.sqlite
+      DEMO_QUERY_LIMIT: "3"
+    volumes:
+      - demo_runtime:/app/data/runtime
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      [
+        "streamlit",
+        "run",
+        "apps/streamlit/app.py",
+        "--server.port=8501",
+        "--server.address=0.0.0.0",
+      ]
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      DUCKDB_PATH: /app/data/demo/analytics.duckdb
+      DEMO_DUCKDB_PATH: /app/data/demo/analytics.duckdb
+      CHARTS_DIR: /app/data/runtime/charts
+      DEMO_QUOTA_PATH: /app/data/runtime/quota.sqlite
+      DEMO_QUERY_LIMIT: "3"
+    volumes:
+      - demo_runtime:/app/data/runtime
+    profiles: ["demo"]
+
+volumes:
+  demo_runtime:
