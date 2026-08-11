@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     olist_raw_dir: Path = Field(default=_REPO_ROOT / "data" / "raw" / "olist")
     olist_metadata_dir: Path = Field(default=_REPO_ROOT / "datasets" / "olist")
     sql_row_limit: int = 200
+    max_agent_iterations: int = 3
 
     @field_validator("duckdb_path", "olist_raw_dir", "olist_metadata_dir", mode="after")
     @classmethod
