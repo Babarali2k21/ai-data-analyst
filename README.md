@@ -1,6 +1,6 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). The agent plans analyses, runs SQL (and later Python/statistics), validates results, and returns findings (LangGraph + DuckDB). **Phases 0–2** are in place: engineering setup, DuckDB analytics DB, and a basic LLM → SQL analyst.
+Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–3** are in place: engineering setup, DuckDB analytics DB, LLM → SQL analyst, and a LangGraph agent (planner → router → SQL/Python → critic → finalizer).
 
 ## Stack
 
@@ -10,41 +10,43 @@ Production-style autonomous data analyst agent for the [Olist Brazilian e-commer
 | Package mgr   | uv                                 |
 | Analytical DB | DuckDB                             |
 | LLM           | OpenAI (`gpt-4.1-mini` default)    |
+| Agent         | LangGraph                          |
 | Validation    | Pydantic                           |
 | Tests         | Pytest                             |
-| Agent (later) | LangGraph                          |
 | API (later)   | FastAPI                            |
 | UI (later)    | Next.js                            |
 
-**Model choice:** `gpt-4.1-mini` — strong at SQL/coding, Chat Completions compatible, and cheap enough for eval loops. Prefer this over `gpt-5` for Phase 2 (gpt-5 needs the Responses API and burns reasoning tokens).
+**Model choice:** `gpt-4.1-mini` — strong at SQL/coding, Chat Completions compatible, cheap for eval loops.
 
 ## Setup
 
 ```bash
 uv sync --all-groups
 cp .env.example .env   # set OPENAI_API_KEY; LLM_MODEL=gpt-4.1-mini
-# Place Olist CSVs under data/raw/olist/
 make ingest && make profile
 ```
 
-## Ask a question (Phase 2)
+## Ask via LangGraph agent (Phase 3)
+
+```bash
+uv run ask-agent "How many orders were delivered?"
+make ask-agent Q='What are the top 5 product categories by revenue?'
+```
+
+Flow: **Planner → Router → SQL analyst (Python stub) → Critic → Finalizer**, with replan on critic failure (max 3 iterations). Python stats tools arrive in Phase 4; if the planner picks Python today, the stub forces a SQL replan.
+
+## Phase 2 single-shot SQL
 
 ```bash
 uv run ask-sql "How many orders were delivered?"
-# or
-make ask Q='What are the top 5 product categories by revenue?'
 ```
-
-Pipeline: question → schema-aware SQL generation → read-only validation → DuckDB execute → short NL answer (one repair attempt on failure).
 
 ## Development
 
 ```bash
-make lint
-make typecheck
-make test
+make lint && make typecheck && make test
 ```
 
 ## What's next
 
-Phase 3+: LangGraph planner/router/critic, Python stats tools, evaluation, FastAPI, Next.js UI. Geolocation is skipped in v1 ingest.
+Phase 4+: Python/statistical tools, richer critic recovery, visualization, evaluation, FastAPI, Next.js UI.
