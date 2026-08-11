@@ -1,0 +1,300 @@
+{
+  "dataset": "olist",
+  "tables": {
+    "customers": {
+      "columns": {
+        "customer_city": {
+          "approx_distinct": 5024,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "customer_id": {
+          "approx_distinct": 101221,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "customer_state": {
+          "approx_distinct": 28,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "customer_unique_id": {
+          "approx_distinct": 93296,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "customer_zip_code_prefix": {
+          "null_count": 0,
+          "type": "VARCHAR"
+        }
+      },
+      "row_count": 99441
+    },
+    "order_items": {
+      "columns": {
+        "freight_value": {
+          "max": "409.68",
+          "min": "0.0",
+          "null_count": 0,
+          "type": "DOUBLE"
+        },
+        "order_id": {
+          "approx_distinct": 87618,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "order_item_id": {
+          "approx_distinct": 21,
+          "max": "21",
+          "min": "1",
+          "null_count": 0,
+          "type": "INTEGER"
+        },
+        "price": {
+          "max": "6735.0",
+          "min": "0.85",
+          "null_count": 0,
+          "type": "DOUBLE"
+        },
+        "product_id": {
+          "approx_distinct": 24292,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "seller_id": {
+          "approx_distinct": 3886,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "shipping_limit_date": {
+          "max": "2020-04-09 22:35:08",
+          "min": "2016-09-19 00:15:34",
+          "null_count": 0,
+          "type": "TIMESTAMP"
+        }
+      },
+      "row_count": 112650
+    },
+    "order_payments": {
+      "columns": {
+        "order_id": {
+          "approx_distinct": 87618,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "payment_installments": {
+          "max": "24",
+          "min": "0",
+          "null_count": 0,
+          "type": "INTEGER"
+        },
+        "payment_sequential": {
+          "max": "29",
+          "min": "1",
+          "null_count": 0,
+          "type": "INTEGER"
+        },
+        "payment_type": {
+          "approx_distinct": 5,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "payment_value": {
+          "max": "13664.08",
+          "min": "0.0",
+          "null_count": 0,
+          "type": "DOUBLE"
+        }
+      },
+      "row_count": 103886
+    },
+    "order_reviews": {
+      "columns": {
+        "order_id": {
+          "approx_distinct": 87618,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "review_answer_timestamp": {
+          "max": "2018-10-29 12:27:35",
+          "min": "2016-10-07 18:32:28",
+          "null_count": 0,
+          "type": "TIMESTAMP"
+        },
+        "review_comment_message": {
+          "null_count": 58247,
+          "type": "VARCHAR"
+        },
+        "review_comment_title": {
+          "null_count": 87656,
+          "type": "VARCHAR"
+        },
+        "review_creation_date": {
+          "max": "2018-08-31 00:00:00",
+          "min": "2016-10-02 00:00:00",
+          "null_count": 0,
+          "type": "TIMESTAMP"
+        },
+        "review_id": {
+          "approx_distinct": 96866,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "review_score": {
+          "approx_distinct": 5,
+          "max": "5",
+          "min": "1",
+          "null_count": 0,
+          "type": "INTEGER"
+        }
+      },
+      "row_count": 99224
+    },
+    "orders": {
+      "columns": {
+        "customer_id": {
+          "approx_distinct": 101221,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "order_approved_at": {
+          "max": "2018-09-03 17:40:06",
+          "min": "2016-09-15 12:16:38",
+          "null_count": 160,
+          "type": "TIMESTAMP"
+        },
+        "order_delivered_carrier_date": {
+          "max": "2018-09-11 19:48:28",
+          "min": "2016-10-08 10:34:01",
+          "null_count": 1783,
+          "type": "TIMESTAMP"
+        },
+        "order_delivered_customer_date": {
+          "max": "2018-10-17 13:22:46",
+          "min": "2016-10-11 13:46:32",
+          "null_count": 2965,
+          "type": "TIMESTAMP"
+        },
+        "order_estimated_delivery_date": {
+          "max": "2018-11-12 00:00:00",
+          "min": "2016-09-30 00:00:00",
+          "null_count": 0,
+          "type": "TIMESTAMP"
+        },
+        "order_id": {
+          "approx_distinct": 87618,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "order_purchase_timestamp": {
+          "max": "2018-10-17 17:30:18",
+          "min": "2016-09-04 21:15:19",
+          "null_count": 0,
+          "type": "TIMESTAMP"
+        },
+        "order_status": {
+          "approx_distinct": 9,
+          "null_count": 0,
+          "type": "VARCHAR"
+        }
+      },
+      "row_count": 99441
+    },
+    "product_category_translation": {
+      "columns": {
+        "product_category_name": {
+          "approx_distinct": 62,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "product_category_name_english": {
+          "approx_distinct": 76,
+          "null_count": 0,
+          "type": "VARCHAR"
+        }
+      },
+      "row_count": 71
+    },
+    "products": {
+      "columns": {
+        "product_category_name": {
+          "approx_distinct": 66,
+          "null_count": 610,
+          "type": "VARCHAR"
+        },
+        "product_description_lenght": {
+          "max": "3992",
+          "min": "4",
+          "null_count": 610,
+          "type": "INTEGER"
+        },
+        "product_height_cm": {
+          "max": "105.0",
+          "min": "2.0",
+          "null_count": 2,
+          "type": "DOUBLE"
+        },
+        "product_id": {
+          "approx_distinct": 24292,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "product_length_cm": {
+          "max": "105.0",
+          "min": "7.0",
+          "null_count": 2,
+          "type": "DOUBLE"
+        },
+        "product_name_lenght": {
+          "max": "76",
+          "min": "5",
+          "null_count": 610,
+          "type": "INTEGER"
+        },
+        "product_photos_qty": {
+          "max": "20",
+          "min": "1",
+          "null_count": 610,
+          "type": "INTEGER"
+        },
+        "product_weight_g": {
+          "max": "40425.0",
+          "min": "0.0",
+          "null_count": 2,
+          "type": "DOUBLE"
+        },
+        "product_width_cm": {
+          "max": "118.0",
+          "min": "6.0",
+          "null_count": 2,
+          "type": "DOUBLE"
+        }
+      },
+      "row_count": 32951
+    },
+    "sellers": {
+      "columns": {
+        "seller_city": {
+          "approx_distinct": 746,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "seller_id": {
+          "approx_distinct": 3886,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "seller_state": {
+          "approx_distinct": 24,
+          "null_count": 0,
+          "type": "VARCHAR"
+        },
+        "seller_zip_code_prefix": {
+          "null_count": 0,
+          "type": "VARCHAR"
+        }
+      },
+      "row_count": 3095
+    }
+  }
+}
