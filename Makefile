@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web streamlit docker-up docker-demo
+.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web streamlit docker-up docker-demo aws-bootstrap aws-push-image aws-app-runner
 
 install:
 	uv sync --group dev
@@ -46,3 +46,16 @@ docker-up:
 
 docker-demo:
 	docker compose --profile demo up --build streamlit
+
+aws-bootstrap:
+	chmod +x scripts/aws-bootstrap.sh
+	./scripts/aws-bootstrap.sh
+
+aws-push-image:
+	chmod +x scripts/aws-push-image.sh
+	./scripts/aws-push-image.sh $(TAG)
+
+aws-app-runner:
+	cd infra/aws && terraform apply -var='create_app_runner=true' -auto-approve
+	@echo "Service URL:" && cd infra/aws && terraform output -raw app_runner_service_url
+	@echo "Set GitHub variable APP_RUNNER_SERVICE_ARN to:" && cd infra/aws && terraform output -raw app_runner_service_arn

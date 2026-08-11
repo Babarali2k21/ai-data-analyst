@@ -50,21 +50,30 @@ Note: Streamlit Cloud disk is ephemeral across restarts, so quotas reset if the 
 
 ## AWS (production-style)
 
-### Option A — App Runner (simplest managed container)
+Full walkthrough: [infra/aws/README.md](../infra/aws/README.md).
 
-1. Build & push the API image (or use GitHub Actions CD below):
+### Quick path
 
 ```bash
-aws ecr create-repository --repository-name ai-data-analyst-api
-docker build -t ai-data-analyst-api .
-docker tag ai-data-analyst-api:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ai-data-analyst-api:latest
-aws ecr get-login-password | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/ai-data-analyst-api:latest
+# once
+brew install awscli
+brew tap hashicorp/tap && brew install hashicorp/tap/terraform
+aws configure   # Access Key ID, Secret, region (eu-central-1)
+
+# from repo root (uses OPENAI_API_KEY from .env)
+make aws-bootstrap          # ECR + Secrets + GitHub OIDC role
+# copy terraform output → GitHub secrets/variables (AWS_CD_ENABLED=true, AWS_ROLE_ARN, …)
+make aws-push-image         # first container image to ECR
+make aws-app-runner         # create App Runner service
 ```
 
-2. Create an App Runner service from that ECR image.
-3. Set env vars: `OPENAI_API_KEY`, `DUCKDB_PATH=/app/data/demo/analytics.duckdb`, `DEMO_QUERY_LIMIT=3`, `API_KEYS=...`.
-4. Health check path: `/health`.
+### Option A — App Runner (simplest managed container)
+
+Terraform creates the App Runner service when `create_app_runner=true` (after an image exists). Manual alternative:
+
+1. Build & push the API image (or use GitHub Actions CD / `make aws-push-image`).
+2. Point App Runner at the ECR image with health check `/health`.
+3. Env: `OPENAI_API_KEY` (Secrets Manager), `DUCKDB_PATH=/app/data/demo/analytics.duckdb`, `DEMO_QUERY_LIMIT=3`.
 
 ### Continuous deployment (GitHub Actions → ECR → App Runner)
 

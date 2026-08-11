@@ -1,0 +1,8 @@
+aws_region         = "eu-central-1"
+project_name       = "ai-data-analyst"
+github_org_repo    = "Babarali2k21/ai-data-analyst"
+github_branch      = "master"
+demo_query_limit   = "3"
+# Keep false until the first image is pushed to ECR, then set true and re-apply.
+create_app_runner  = false
+image_tag          = "latest"
