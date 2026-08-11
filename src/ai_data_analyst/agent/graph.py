@@ -31,6 +31,9 @@ class AgentResult(BaseModel):
     supporting_sql: list[str] = Field(default_factory=list)
     critic_passed: bool = False
     critic_feedback: str = ""
+    failure_type: str = "none"
+    recovery_action: str = "accept"
+    recovery_history: list[str] = Field(default_factory=list)
     iteration: int = 0
     model: str = ""
     query_result: dict[str, Any] = Field(default_factory=dict)
@@ -71,6 +74,8 @@ def build_analyst_graph(
         partial(route_after_critic, settings=settings),
         {
             "planner": "planner",
+            "sql_analyst": "sql_analyst",
+            "python_analyst": "python_analyst",
             "finalizer": "finalizer",
         },
     )
@@ -98,6 +103,9 @@ def run_analyst_agent(
         "model": settings.llm_model,
         "critic_passed": False,
         "critic_feedback": "",
+        "failure_type": "none",
+        "recovery_action": "accept",
+        "recovery_history": [],
         "error": "",
         "findings": "",
         "answer": "",
@@ -117,6 +125,9 @@ def run_analyst_agent(
         supporting_sql=list(final_state.get("supporting_sql") or []),
         critic_passed=bool(final_state.get("critic_passed")),
         critic_feedback=str(final_state.get("critic_feedback") or ""),
+        failure_type=str(final_state.get("failure_type") or "none"),
+        recovery_action=str(final_state.get("recovery_action") or "accept"),
+        recovery_history=list(final_state.get("recovery_history") or []),
         iteration=int(final_state.get("iteration") or 0),
         model=settings.llm_model,
         query_result=dict(final_state.get("query_result") or {}),
@@ -139,6 +150,10 @@ def main() -> None:
     print(f"Model: {result.model}")
     print(f"Iterations: {result.iteration}")
     print(f"Critic: {'PASS' if result.critic_passed else 'FAIL'}")
+    if not result.critic_passed:
+        print(f"Failure: {result.failure_type} → {result.recovery_action}")
+    if result.recovery_history:
+        print(f"Recovery history: {result.recovery_history}")
     if result.plan:
         print(f"\nPlan goal: {result.plan.get('goal')}")
         print(f"Tool: {result.plan.get('tool')}")

@@ -19,6 +19,8 @@ Produce a short plan for answering the user question.
   IQR outlier detection, or group mean/median comparisons beyond a simple SQL aggregate.
 - The Python analyst will still fetch data via SQL, then run a fixed stats operation
   (no arbitrary code execution).
+- If critic recovery_action is switch_to_sql, you MUST set tool="sql".
+- If critic recovery_action is switch_to_python, you MUST set tool="python".
 - If prior critic feedback exists, revise the plan to address it.
 - Keep steps concrete and minimal (2-5).
 """
@@ -33,18 +35,27 @@ def make_planner_node(llm: BaseChatModel) -> Any:
         schema_context = state.get("schema_context") or ""
         feedback = state.get("critic_feedback") or ""
         error = state.get("error") or ""
+        recovery_action = state.get("recovery_action") or ""
+        failure_type = state.get("failure_type") or ""
 
         user_parts = [
             f"Schema:\n{schema_context}",
             f"\nQuestion:\n{question}",
             f"\nIteration: {iteration}",
         ]
+        if recovery_action:
+            user_parts.append(f"\nRecovery action required: {recovery_action}")
+        if failure_type:
+            user_parts.append(f"\nFailure type: {failure_type}")
         if feedback:
             user_parts.append(f"\nCritic feedback to address:\n{feedback}")
         if error:
             user_parts.append(f"\nPrevious error:\n{error}")
         if state.get("sql"):
             user_parts.append(f"\nPrevious SQL:\n{state['sql']}")
+        history = state.get("recovery_history") or []
+        if history:
+            user_parts.append(f"\nRecovery history: {history}")
 
         plan = structured.invoke(
             [
@@ -54,6 +65,12 @@ def make_planner_node(llm: BaseChatModel) -> Any:
         )
         if not isinstance(plan, AnalysisPlan):
             plan = AnalysisPlan.model_validate(plan)
+
+        # Enforce tool switches from critic recovery
+        if recovery_action == "switch_to_sql":
+            plan.tool = "sql"
+        elif recovery_action == "switch_to_python":
+            plan.tool = "python"
 
         return {
             "plan": plan.model_dump(),
