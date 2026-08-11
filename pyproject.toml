@@ -29,6 +29,7 @@ ingest-olist = "ai_data_analyst.data.ingestion.olist:main"
 profile-olist = "ai_data_analyst.data.profiling.profiler:main"
 ask-sql = "ai_data_analyst.analyst.sql_pipeline:main"
 ask-agent = "ai_data_analyst.agent.graph:main"
+eval-olist = "ai_data_analyst.evaluation.runner:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]

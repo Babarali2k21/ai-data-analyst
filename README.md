@@ -1,45 +1,58 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–6** are in place: setup, DuckDB, LLM→SQL, LangGraph agent, Python/stats, critic recovery, and structured visualization.
+Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–7** are in place, including a 50-question evaluation benchmark.
 
 ## Stack
 
 | Component     | Technology                         |
 | ------------- | ---------------------------------- |
 | Language      | Python 3.12                        |
-| Package mgr   | uv                                 |
 | Analytical DB | DuckDB                             |
-| LLM           | OpenAI (`gpt-4.1-mini` default)    |
+| LLM           | OpenAI (`gpt-4.1-mini`)            |
 | Agent         | LangGraph                          |
-| Stats         | Pandas (structured ops only)       |
-| Charts        | Structured `ChartSpec` + matplotlib|
-| Validation    | Pydantic                           |
+| Stats         | Pandas structured ops              |
+| Charts        | `ChartSpec` + matplotlib           |
+| Evaluation    | Custom metrics + LLM-as-judge      |
 | Tests         | Pytest                             |
 
 ## Setup
 
 ```bash
 uv sync --all-groups
-cp .env.example .env   # set OPENAI_API_KEY; LLM_MODEL=gpt-4.1-mini
+cp .env.example .env
 make ingest && make profile
 ```
 
-## Ask via LangGraph agent
+## Ask
 
 ```bash
 uv run ask-agent "What are the top 5 product categories by revenue?"
-uv run ask-agent "What is the correlation between item price and freight_value?"
 ```
 
-Flow: **Planner → Router → SQL/Python → Critic → Visualizer → Finalizer**.
+## Evaluate (Phase 7)
 
-Charts are structured JSON (not frontend code), e.g.:
+50-question suite at `datasets/olist/benchmark.yaml` (easy/medium/hard).
 
-```json
-{"type": "bar", "x": "category", "y": "revenue", "title": "Top categories"}
+```bash
+# Smoke a couple of easy numeric questions
+uv run eval-olist --mode agent --ids e01 e06 --no-judge
+
+# SQL-only baseline vs full agent
+uv run eval-olist --mode sql --difficulty easy --no-judge
+uv run eval-olist --mode agent --limit 10
+
+# Full suite (uses LLM judge where marked; costs tokens)
+uv run eval-olist --mode agent
 ```
 
-Optional PNG renders land in `data/processed/charts/`.
+Reports write to `data/processed/eval_<mode>.json` with:
+
+- task completion rate
+- SQL execution accuracy
+- tool-selection accuracy
+- answer accuracy (numeric / contains / judge)
+- hallucination rate (heuristic + judge)
+- average iterations / latency
 
 ## Development
 
@@ -49,4 +62,4 @@ make lint && make typecheck && make test
 
 ## What's next
 
-Phase 7+: evaluation framework, FastAPI, Next.js UI, observability/security, deploy.
+Phase 8+: FastAPI, Next.js UI, observability/security, Docker/AWS, interview prep.
