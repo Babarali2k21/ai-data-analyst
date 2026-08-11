@@ -12,7 +12,7 @@ def test_settings_defaults(tmp_path: Path, monkeypatch: object) -> None:
         olist_raw_dir=tmp_path / "raw",
         olist_metadata_dir=tmp_path / "meta",
     )
-    assert settings.llm_model == "gpt-4o-mini"
+    assert settings.llm_model == "gpt-4.1-mini"
     assert settings.duckdb_path == tmp_path / "analytics.duckdb"
 
 

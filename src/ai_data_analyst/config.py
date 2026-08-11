@@ -20,11 +20,14 @@ class Settings(BaseSettings):
     )
 
     openai_api_key: str = ""
-    llm_model: str = "gpt-4o-mini"
+    # gpt-4.1-mini: strong SQL/coding, Chat Completions compatible, low eval cost
+    llm_model: str = "gpt-4.1-mini"
+    llm_temperature: float = 0.0
 
     duckdb_path: Path = Field(default=_REPO_ROOT / "data" / "processed" / "analytics.duckdb")
     olist_raw_dir: Path = Field(default=_REPO_ROOT / "data" / "raw" / "olist")
     olist_metadata_dir: Path = Field(default=_REPO_ROOT / "datasets" / "olist")
+    sql_row_limit: int = 200
 
     @field_validator("duckdb_path", "olist_raw_dir", "olist_metadata_dir", mode="after")
     @classmethod

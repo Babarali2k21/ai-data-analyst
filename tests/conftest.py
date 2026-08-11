@@ -26,5 +26,5 @@ def temp_settings(tmp_path: Path, fixture_raw_dir: Path, metadata_dir: Path) -> 
         olist_raw_dir=fixture_raw_dir,
         olist_metadata_dir=metadata_dir,
         openai_api_key="",
-        llm_model="gpt-4o-mini",
+        llm_model="gpt-4.1-mini",
     )
