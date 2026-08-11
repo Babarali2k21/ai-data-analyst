@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web streamlit docker-up docker-demo aws-bootstrap aws-push-image aws-app-runner
+.PHONY: install lint format typecheck test ingest profile ask ask-agent eval api web docker-up aws-bootstrap aws-push-image aws-app-runner
 
 install:
 	uv sync --group dev
@@ -35,17 +35,10 @@ api:
 	uv run serve-api
 
 web:
-	cd apps/web && npm run dev -- --port 3001
-
-streamlit:
-	uv sync --group dev --group demo
-	uv run streamlit run apps/streamlit/app.py --server.port 8501
+	cd apps/web && npm run dev -- --port 3000
 
 docker-up:
 	docker compose up --build
-
-docker-demo:
-	docker compose --profile demo up --build streamlit
 
 aws-bootstrap:
 	chmod +x scripts/aws-bootstrap.sh

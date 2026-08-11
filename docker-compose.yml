@@ -11,8 +11,6 @@ services:
       DUCKDB_PATH: /app/data/demo/analytics.duckdb
       DEMO_DUCKDB_PATH: /app/data/demo/analytics.duckdb
       CHARTS_DIR: /app/data/runtime/charts
-      DEMO_QUOTA_PATH: /app/data/runtime/quota.sqlite
-      DEMO_QUERY_LIMIT: "3"
     volumes:
       - demo_runtime:/app/data/runtime
     healthcheck:
@@ -32,32 +30,6 @@ services:
     depends_on:
       api:
         condition: service_healthy
-
-  streamlit:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command:
-      [
-        "streamlit",
-        "run",
-        "apps/streamlit/app.py",
-        "--server.port=8501",
-        "--server.address=0.0.0.0",
-      ]
-    ports:
-      - "8501:8501"
-    env_file:
-      - .env
-    environment:
-      DUCKDB_PATH: /app/data/demo/analytics.duckdb
-      DEMO_DUCKDB_PATH: /app/data/demo/analytics.duckdb
-      CHARTS_DIR: /app/data/runtime/charts
-      DEMO_QUOTA_PATH: /app/data/runtime/quota.sqlite
-      DEMO_QUERY_LIMIT: "3"
-    volumes:
-      - demo_runtime:/app/data/runtime
-    profiles: ["demo"]
 
 volumes:
   demo_runtime:

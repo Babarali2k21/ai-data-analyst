@@ -51,13 +51,9 @@ class Settings(BaseSettings):
     api_rate_limit_per_minute: int = 30
     api_analysis_timeout_seconds: float = 180.0
 
-    # Phase 11 — demo / Streamlit burn protection
-    demo_query_limit: int = 3
+    # Bundled lightweight DuckDB for Docker / AWS (fixture subset)
     demo_duckdb_path: Path = Field(
         default=_REPO_ROOT / "data" / "demo" / "analytics.duckdb"
-    )
-    demo_quota_path: Path = Field(
-        default=_REPO_ROOT / "data" / "demo" / "quota.sqlite"
     )
 
     @field_validator("api_keys", mode="before")
@@ -73,7 +69,6 @@ class Settings(BaseSettings):
         "olist_metadata_dir",
         "charts_dir",
         "demo_duckdb_path",
-        "demo_quota_path",
         mode="after",
     )
     @classmethod

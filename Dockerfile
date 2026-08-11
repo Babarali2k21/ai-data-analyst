@@ -19,23 +19,18 @@ COPY src ./src
 COPY datasets ./datasets
 COPY tests/fixtures/olist ./tests/fixtures/olist
 COPY data/demo ./data/demo
-COPY apps/streamlit ./apps/streamlit
-COPY .streamlit ./.streamlit
 
-RUN uv sync --frozen --no-dev --no-editable \
-    && uv pip install "streamlit>=1.42.0"
+RUN uv sync --frozen --no-dev --no-editable
 
 ENV PATH="/app/.venv/bin:$PATH" \
     DUCKDB_PATH=/app/data/demo/analytics.duckdb \
     DEMO_DUCKDB_PATH=/app/data/demo/analytics.duckdb \
     OLIST_METADATA_DIR=/app/datasets/olist \
     CHARTS_DIR=/app/data/runtime/charts \
-    DEMO_QUOTA_PATH=/app/data/runtime/quota.sqlite \
-    DEMO_QUERY_LIMIT=3 \
     API_HOST=0.0.0.0 \
     API_PORT=8000
 
 RUN mkdir -p /app/data/runtime/charts
 
-EXPOSE 8000 8501
+EXPOSE 8000
 CMD ["serve-api"]

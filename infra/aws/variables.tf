@@ -28,12 +28,6 @@ variable "openai_api_key" {
   sensitive   = true
 }
 
-variable "demo_query_limit" {
-  type        = string
-  description = "Per-visitor demo query cap."
-  default     = "3"
-}
-
 variable "api_keys" {
   type        = string
   description = "Optional comma-separated API keys for the FastAPI service. Empty disables auth."

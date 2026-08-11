@@ -1,11 +1,11 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–11** are in place (agent + API + Next.js + observability + Docker/Streamlit demo).
+Production-style autonomous data analyst for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–11** are in place (agent + API + Next.js + observability + Docker/AWS).
 
 ## Setup
 
 ```bash
-uv sync --all-groups
+uv sync --group dev
 cp .env.example .env   # set OPENAI_API_KEY
 make ingest && make profile
 
@@ -20,34 +20,29 @@ make api
 
 # terminal 2
 make web
-# open http://localhost:3001  (port 3000 is often taken by Grafana)
+# open http://localhost:3000
 ```
 
 UI flow: **Dataset → Question → Analysis activity → Findings → Charts → Supporting SQL**.
 
-## Live Streamlit demo (3 queries / visitor)
-
-```bash
-make streamlit
-# open http://localhost:8501
-```
-
-Deploy for free on [Streamlit Community Cloud](https://share.streamlit.io):
-
-1. Main file: `apps/streamlit/app.py`
-2. Requirements: `requirements-streamlit.txt`
-3. Secrets: `OPENAI_API_KEY`, `DEMO_QUERY_LIMIT=3` (see `.streamlit/secrets.toml.example`)
-
-Each visitor is capped at **3 queries** (IP + sticky `vid`) so a public link will not burn your OpenAI budget.
-
-Full deploy notes: [docs/deploy/README.md](docs/deploy/README.md).
-
 ## Docker
 
 ```bash
-docker compose up --build          # API :8000 + Next.js :3000
-docker compose --profile demo up streamlit   # Streamlit :8501
+docker compose up --build   # API :8000 + Next.js :3000
 ```
+
+## AWS
+
+Terraform + CD: [infra/aws/README.md](infra/aws/README.md) and [docs/deploy/README.md](docs/deploy/README.md)
+
+```bash
+aws configure
+make aws-bootstrap      # ECR + Secrets + GitHub OIDC role
+make aws-push-image     # first image to ECR
+make aws-app-runner     # App Runner API
+```
+
+CD workflow: `.github/workflows/cd-aws.yml` (enable with `AWS_CD_ENABLED=true`).
 
 ## API
 
@@ -60,19 +55,17 @@ docker compose --profile demo up streamlit   # Streamlit :8501
 
 Docs: http://127.0.0.1:8000/docs
 
-### Security (Phase 10)
+### Security
 
-- Optional API keys via `API_KEYS` (comma-separated). Send `X-API-Key` or `Authorization: Bearer <key>`. Empty = auth disabled for local demo.
-- In-memory rate limit: `API_RATE_LIMIT_PER_MINUTE` (default 30).
+- Optional API keys via `API_KEYS` (`X-API-Key` or Bearer).
+- Rate limit: `API_RATE_LIMIT_PER_MINUTE` (default 30).
 - Analysis timeout: `API_ANALYSIS_TIMEOUT_SECONDS` (default 180).
-- Existing guards: read-only DuckDB, SQL allowlist, iteration caps, structured stats only (no arbitrary Python).
+- Read-only DuckDB, SQL allowlist, iteration caps, structured stats only.
 
-### Observability (Phase 10)
+### Observability
 
-- JSON structured logs (`LOG_LEVEL`) with `request_id` / `run_id`.
-- `X-Request-Id` response header (echo or generate).
-- Analysis responses include `observability` (latency, SQL/LLM call counts, token estimates).
-- Optional OpenTelemetry FastAPI instrumentation when `opentelemetry-instrumentation-fastapi` is installed.
+- JSON logs with `request_id` / `run_id`, `X-Request-Id` header.
+- Analysis responses include `observability` metrics.
 
 ## CLI
 
@@ -88,9 +81,7 @@ make lint && make typecheck && make test
 cd apps/web && npm run build
 ```
 
-CI runs the same checks on every push/PR (`.github/workflows/ci.yml`).
-AWS CD (ECR → App Runner) is in `.github/workflows/cd-aws.yml`.
-Provision AWS with Terraform: `make aws-bootstrap` (see [infra/aws/README.md](infra/aws/README.md)).
+CI: `.github/workflows/ci.yml`. AWS CD: `.github/workflows/cd-aws.yml`.
 
 ## What's next
 

@@ -13,8 +13,6 @@ on:
       - "uv.lock"
       - "data/demo/**"
       - "datasets/**"
-      - "apps/streamlit/**"
-      - "requirements-streamlit.txt"
       - ".github/workflows/cd-aws.yml"
   workflow_dispatch:
 

@@ -219,8 +219,6 @@ resource "aws_apprunner_service" "api" {
           DUCKDB_PATH                  = "/app/data/demo/analytics.duckdb"
           DEMO_DUCKDB_PATH             = "/app/data/demo/analytics.duckdb"
           CHARTS_DIR                   = "/app/data/runtime/charts"
-          DEMO_QUOTA_PATH              = "/app/data/runtime/quota.sqlite"
-          DEMO_QUERY_LIMIT             = var.demo_query_limit
           OLIST_METADATA_DIR           = "/app/datasets/olist"
           API_HOST                     = "0.0.0.0"
           API_PORT                     = "8000"
