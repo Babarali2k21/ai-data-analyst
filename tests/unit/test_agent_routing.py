@@ -27,7 +27,7 @@ def test_route_after_critic_pass_and_max_iterations() -> None:
             {"question": "q", "critic_passed": True, "iteration": 1},
             settings,
         )
-        == "finalizer"
+        == "visualizer"
     )
     assert (
         route_after_critic(
@@ -39,7 +39,7 @@ def test_route_after_critic_pass_and_max_iterations() -> None:
             },
             settings,
         )
-        == "finalizer"
+        == "visualizer"
     )
 
 

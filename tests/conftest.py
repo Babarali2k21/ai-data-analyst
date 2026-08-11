@@ -25,6 +25,7 @@ def temp_settings(tmp_path: Path, fixture_raw_dir: Path, metadata_dir: Path) -> 
         duckdb_path=tmp_path / "test.duckdb",
         olist_raw_dir=fixture_raw_dir,
         olist_metadata_dir=metadata_dir,
+        charts_dir=tmp_path / "charts",
         openai_api_key="",
         llm_model="gpt-4.1-mini",
     )

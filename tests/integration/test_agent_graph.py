@@ -6,6 +6,7 @@ from ai_data_analyst.agent.graph import run_analyst_agent
 from ai_data_analyst.agent.state import AnalysisPlan, CriticVerdict
 from ai_data_analyst.config import Settings
 from ai_data_analyst.data.ingestion.olist import ingest_olist
+from ai_data_analyst.tools.charts import ChartProposal
 from ai_data_analyst.tools.stats import StatsSpec
 
 
@@ -37,6 +38,16 @@ class FakeLLM:
                         columns=["price", "freight_value"],
                         rationale="correlation of price and freight",
                     )
+                if schema is ChartProposal:
+                    if parent.tool == "python":
+                        return ChartProposal(
+                            should_chart=True,
+                            type="scatter",
+                            x="price",
+                            y="freight_value",
+                            title="Price vs freight",
+                        )
+                    return ChartProposal(should_chart=False, reason="scalar count")
                 raise TypeError(f"Unexpected schema {schema}")
 
         return Structured()
@@ -70,6 +81,7 @@ def test_agent_sql_path_with_fake_llm(temp_settings: Settings) -> None:
     assert result.answer
     assert result.sql
     assert "Generated and executed SQL" in result.activity
+    assert any("visualization" in step.lower() for step in result.activity)
     assert result.iteration >= 1
 
 
@@ -87,3 +99,5 @@ def test_agent_python_stats_path(temp_settings: Settings) -> None:
     assert "matrix" in (result.python_result.get("summary") or {})
     assert any("statistical analysis" in step.lower() for step in result.activity)
     assert "correlated" in result.answer.lower() or result.answer
+    assert result.charts
+    assert result.charts[0]["type"] == "scatter"

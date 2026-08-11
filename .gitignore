@@ -16,3 +16,5 @@ data/processed/*
 # Keep directory structure
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+!data/processed/charts/
+!data/processed/charts/.gitkeep
