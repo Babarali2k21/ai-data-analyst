@@ -33,6 +33,7 @@ class AnalystState(TypedDict, total=False):
     route: Literal["sql", "python"]
     sql: str
     query_result: dict[str, Any]
+    python_result: dict[str, Any]
     findings: str
     critic_passed: bool
     critic_feedback: str
