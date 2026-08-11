@@ -27,6 +27,7 @@ ai-data-analyst = "ai_data_analyst:main"
 ingest-olist = "ai_data_analyst.data.ingestion.olist:main"
 profile-olist = "ai_data_analyst.data.profiling.profiler:main"
 ask-sql = "ai_data_analyst.analyst.sql_pipeline:main"
+ask-agent = "ai_data_analyst.agent.graph:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
@@ -61,7 +62,7 @@ module = ["duckdb.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = ["langchain_openai.*", "langchain_core.*"]
+module = ["langchain_openai.*", "langchain_core.*", "langgraph.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

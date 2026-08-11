@@ -1,4 +1,4 @@
-.PHONY: install lint format typecheck test ingest profile ask
+.PHONY: install lint format typecheck test ingest profile ask ask-agent
 
 install:
 	uv sync --all-groups
@@ -24,3 +24,6 @@ profile:
 
 ask:
 	uv run ask-sql $(Q)
+
+ask-agent:
+	uv run ask-agent $(Q)
