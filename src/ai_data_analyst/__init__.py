@@ -5,7 +5,7 @@ from ai_data_analyst.config import Settings, get_settings
 
 def main() -> None:
     settings = get_settings()
-    duckdb_exists = settings.duckdb_path.exists() and settings.duckdb_path.stat().st_size > 0
+    duckdb_exists = settings.duckdb_ready
     print("ai-data-analyst")
     print(f"  duckdb_path:     {settings.duckdb_path}")
     print(f"  duckdb_ready:    {duckdb_exists}")

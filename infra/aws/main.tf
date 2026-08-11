@@ -215,18 +215,10 @@ resource "aws_apprunner_service" "api" {
       image_configuration {
         port = "8000"
 
+        # Image Dockerfile ENV is SSOT for paths/defaults; override only secrets + API keys.
         runtime_environment_variables = {
-          DUCKDB_PATH                  = "/app/data/demo/analytics.duckdb"
-          DEMO_DUCKDB_PATH             = "/app/data/demo/analytics.duckdb"
-          CHARTS_DIR                   = "/app/data/runtime/charts"
-          OLIST_METADATA_DIR           = "/app/datasets/olist"
-          API_HOST                     = "0.0.0.0"
-          API_PORT                     = "8000"
-          LOG_LEVEL                    = "INFO"
-          LLM_MODEL                    = "gpt-4.1-mini"
-          API_KEYS                     = var.api_keys
-          API_RATE_LIMIT_PER_MINUTE    = "30"
-          API_ANALYSIS_TIMEOUT_SECONDS = "180"
+          CHARTS_DIR = "/app/data/runtime/charts"
+          API_KEYS   = var.api_keys
         }
 
         runtime_environment_secrets = {

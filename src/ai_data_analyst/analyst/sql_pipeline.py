@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import argparse
-import json
 import re
-from typing import Any
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -20,6 +18,7 @@ from ai_data_analyst.analyst.prompts import (
 )
 from ai_data_analyst.config import Settings, get_settings
 from ai_data_analyst.llm.client import get_chat_model
+from ai_data_analyst.tools.preview import preview_query_result
 from ai_data_analyst.tools.sql import QueryResult, run_sql
 from ai_data_analyst.tools.sql_validation import SQLValidationError, validate_sql
 
@@ -44,17 +43,6 @@ def extract_sql(text: str) -> str:
     return text
 
 
-def _result_preview(result: QueryResult, max_rows: int = 20) -> str:
-    preview_rows = result.rows[:max_rows]
-    payload: dict[str, Any] = {
-        "columns": result.columns,
-        "row_count": result.row_count,
-        "truncated": result.truncated,
-        "rows": preview_rows,
-    }
-    return json.dumps(payload, indent=2, default=str)
-
-
 def generate_sql(
     question: str,
     *,
@@ -72,6 +60,35 @@ def generate_sql(
     return extract_sql(content)
 
 
+def repair_sql(
+    question: str,
+    *,
+    schema_context: str,
+    llm: BaseChatModel,
+    previous_sql: str = "",
+    error: str = "",
+    critic_feedback: str = "",
+) -> str:
+    """Ask the LLM for a corrected DuckDB SELECT/WITH query."""
+    repair_prompt = (
+        f"{sql_user_prompt(question, schema_context)}\n\n"
+        f"Critic feedback:\n{critic_feedback or '(none)'}\n\n"
+        f"Previous error:\n{error or '(none)'}\n\n"
+        f"Previous SQL:\n{previous_sql or '(none)'}\n\n"
+        "Write a corrected single DuckDB SELECT/WITH query only."
+    )
+    response = llm.invoke(
+        [
+            SystemMessage(content=SQL_SYSTEM_PROMPT),
+            HumanMessage(content=repair_prompt),
+        ]
+    )
+    content = response.content
+    if not isinstance(content, str):
+        content = str(content)
+    return extract_sql(content)
+
+
 def summarize_answer(
     question: str,
     sql: str,
@@ -81,7 +98,9 @@ def summarize_answer(
 ) -> str:
     messages = [
         SystemMessage(content=ANSWER_SYSTEM_PROMPT),
-        HumanMessage(content=answer_user_prompt(question, sql, _result_preview(result))),
+        HumanMessage(
+            content=answer_user_prompt(question, sql, preview_query_result(result, max_rows=20))
+        ),
     ]
     response = llm.invoke(messages)
     content = response.content
@@ -108,22 +127,13 @@ def ask_sql(
         if attempt == 1:
             sql = generate_sql(question, schema_context=schema_context, llm=llm)
         else:
-            repair_prompt = (
-                f"{sql_user_prompt(question, schema_context)}\n\n"
-                f"Previous SQL failed with error:\n{last_error}\n\n"
-                f"Previous SQL:\n{sql}\n\n"
-                "Write a corrected single DuckDB SELECT/WITH query only."
+            sql = repair_sql(
+                question,
+                schema_context=schema_context,
+                llm=llm,
+                previous_sql=sql,
+                error=last_error or "",
             )
-            response = llm.invoke(
-                [
-                    SystemMessage(content=SQL_SYSTEM_PROMPT),
-                    HumanMessage(content=repair_prompt),
-                ]
-            )
-            content = response.content
-            if not isinstance(content, str):
-                content = str(content)
-            sql = extract_sql(content)
 
         try:
             validate_sql(sql)

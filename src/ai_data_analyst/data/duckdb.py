@@ -11,6 +11,11 @@ import pandas as pd
 from ai_data_analyst.config import Settings, get_settings
 
 
+def is_duckdb_ready(path: Path) -> bool:
+    """True when the analytics DB file exists and is non-empty."""
+    return path.exists() and path.stat().st_size > 0
+
+
 def get_connection(
     *,
     read_only: bool = False,

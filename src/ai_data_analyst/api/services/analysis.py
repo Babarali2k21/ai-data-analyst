@@ -37,7 +37,7 @@ class AnalysisTimeoutError(Exception):
 def _ensure_ready(settings: Settings) -> None:
     if not settings.openai_api_key:
         raise AnalysisNotReadyError("OPENAI_API_KEY is not configured")
-    if not settings.duckdb_path.exists() or settings.duckdb_path.stat().st_size == 0:
+    if not settings.duckdb_ready:
         raise AnalysisNotReadyError(
             "DuckDB analytics database is missing. Run: make ingest"
         )
@@ -62,27 +62,8 @@ def _to_response(
             query_result=result.query_result.model_dump(),
             observability=observability,
         )
-    return AnalysisResponse(
-        question=result.question,
-        answer=result.answer,
-        mode="agent",
-        sql=result.sql,
-        plan=result.plan,
-        activity=result.activity,
-        supporting_sql=result.supporting_sql,
-        critic_passed=result.critic_passed,
-        critic_feedback=result.critic_feedback,
-        failure_type=result.failure_type,
-        recovery_action=result.recovery_action,
-        recovery_history=result.recovery_history,
-        iteration=result.iteration,
-        model=result.model,
-        query_result=result.query_result,
-        python_result=result.python_result,
-        charts=result.charts,
-        chart_paths=result.chart_paths,
-        observability=observability,
-    )
+    payload = result.model_dump()
+    return AnalysisResponse(mode="agent", observability=observability, **payload)
 
 
 def run_analysis(

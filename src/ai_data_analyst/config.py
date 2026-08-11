@@ -35,15 +35,8 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_reload: bool = False
-    api_cors_origins: list[str] = Field(
-        default_factory=lambda: [
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://localhost:3001",
-            "http://127.0.0.1:3001",
-            "http://localhost:5173",
-        ]
-    )
+    # Extra allowed origins (localhost covered by regex in create_app).
+    api_cors_origins: list[str] = Field(default_factory=list)
 
     # Phase 10 — security + observability
     log_level: str = "INFO"
@@ -80,6 +73,16 @@ class Settings(BaseSettings):
     @property
     def repo_root(self) -> Path:
         return _REPO_ROOT
+
+    @property
+    def duckdb_ready(self) -> bool:
+        from ai_data_analyst.data.duckdb import is_duckdb_ready
+
+        return is_duckdb_ready(self.duckdb_path)
+
+    @property
+    def auth_required(self) -> bool:
+        return any(k.strip() for k in self.api_keys)
 
 
 @lru_cache

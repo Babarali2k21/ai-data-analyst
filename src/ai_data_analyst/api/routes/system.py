@@ -18,19 +18,19 @@ SettingsDep = Annotated[Settings, Depends(settings_dep)]
 @router.get("/health", response_model=HealthResponse)
 @router.get("/api/v1/health", response_model=HealthResponse)
 def health(settings: SettingsDep) -> HealthResponse:
-    ready = settings.duckdb_path.exists() and settings.duckdb_path.stat().st_size > 0
+    ready = settings.duckdb_ready
     return HealthResponse(
         status="ok" if ready else "degraded",
         duckdb_ready=ready,
         model=settings.llm_model,
-        auth_required=bool([k for k in settings.api_keys if k.strip()]),
+        auth_required=settings.auth_required,
     )
 
 
 @router.get("/api/v1/dataset", response_model=DatasetInfoResponse)
 def dataset_info(settings: SettingsDep) -> DatasetInfoResponse:
     tables: list[str] = []
-    if settings.duckdb_path.exists() and settings.duckdb_path.stat().st_size > 0:
+    if settings.duckdb_ready:
         tables = list_tables(path=settings.duckdb_path)
     return DatasetInfoResponse(
         dataset="olist",

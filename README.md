@@ -81,6 +81,8 @@ Docs: http://127.0.0.1:8000/docs
 
 Dependencies flow **down** only: `api` → `agent`/`analyst` → `tools` → `data`.
 
+Principles we keep: **DRY**, **KISS**, **YAGNI**, **SOLID**, **SoC**, **SSOT** (`Settings` + Dockerfile ENV for containers).
+
 ## CLI
 
 ```bash

@@ -7,7 +7,7 @@ from typing import Any
 from langchain_core.language_models.chat_models import BaseChatModel
 
 from ai_data_analyst.agent.state import AnalystState
-from ai_data_analyst.analyst.sql_pipeline import generate_sql, summarize_answer
+from ai_data_analyst.analyst.sql_pipeline import generate_sql, repair_sql, summarize_answer
 from ai_data_analyst.config import Settings
 from ai_data_analyst.tools.sql import run_sql
 from ai_data_analyst.tools.sql_validation import SQLValidationError, validate_sql
@@ -23,28 +23,14 @@ def make_sql_analyst_node(llm: BaseChatModel, settings: Settings) -> Any:
 
         try:
             if feedback or prior_error:
-                from langchain_core.messages import HumanMessage, SystemMessage
-
-                from ai_data_analyst.analyst.prompts import SQL_SYSTEM_PROMPT, sql_user_prompt
-
-                repair = (
-                    f"{sql_user_prompt(question, schema_context)}\n\n"
-                    f"Critic feedback:\n{feedback or '(none)'}\n\n"
-                    f"Previous error:\n{prior_error or '(none)'}\n\n"
-                    f"Previous SQL:\n{prior_sql or '(none)'}\n\n"
-                    "Write a corrected single DuckDB SELECT/WITH query only."
+                sql = repair_sql(
+                    question,
+                    schema_context=schema_context,
+                    llm=llm,
+                    previous_sql=prior_sql,
+                    error=prior_error,
+                    critic_feedback=feedback,
                 )
-                response = llm.invoke(
-                    [
-                        SystemMessage(content=SQL_SYSTEM_PROMPT),
-                        HumanMessage(content=repair),
-                    ]
-                )
-                content = response.content
-                sql = content if isinstance(content, str) else str(content)
-                from ai_data_analyst.analyst.sql_pipeline import extract_sql
-
-                sql = extract_sql(sql)
             else:
                 sql = generate_sql(question, schema_context=schema_context, llm=llm)
 
