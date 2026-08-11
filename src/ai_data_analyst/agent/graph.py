@@ -1,4 +1,4 @@
-"""Compile and run the Phase 3 LangGraph analyst agent."""
+"""Compile and run the LangGraph analyst agent."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from ai_data_analyst.agent.nodes.critic import make_critic_node, route_after_critic
 from ai_data_analyst.agent.nodes.finalizer import make_finalizer_node
 from ai_data_analyst.agent.nodes.planner import make_planner_node
-from ai_data_analyst.agent.nodes.python_analyst import python_analyst
+from ai_data_analyst.agent.nodes.python_analyst import make_python_analyst_node
 from ai_data_analyst.agent.nodes.router import route_after_planner, router
 from ai_data_analyst.agent.nodes.sql_analyst import make_sql_analyst_node
 from ai_data_analyst.agent.state import AnalystState
@@ -34,6 +34,7 @@ class AgentResult(BaseModel):
     iteration: int = 0
     model: str = ""
     query_result: dict[str, Any] = Field(default_factory=dict)
+    python_result: dict[str, Any] = Field(default_factory=dict)
 
 
 def build_analyst_graph(
@@ -49,7 +50,7 @@ def build_analyst_graph(
     graph.add_node("planner", make_planner_node(llm))
     graph.add_node("router", router)
     graph.add_node("sql_analyst", make_sql_analyst_node(llm, settings))
-    graph.add_node("python_analyst", python_analyst)
+    graph.add_node("python_analyst", make_python_analyst_node(llm, settings))
     graph.add_node("critic", make_critic_node(llm))
     graph.add_node("finalizer", make_finalizer_node(llm))
 
@@ -102,6 +103,7 @@ def run_analyst_agent(
         "answer": "",
         "sql": "",
         "query_result": {},
+        "python_result": {},
         "plan": {},
     }
     final_state = app.invoke(initial)
@@ -118,11 +120,12 @@ def run_analyst_agent(
         iteration=int(final_state.get("iteration") or 0),
         model=settings.llm_model,
         query_result=dict(final_state.get("query_result") or {}),
+        python_result=dict(final_state.get("python_result") or {}),
     )
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Phase 3 LangGraph analyst agent")
+    parser = argparse.ArgumentParser(description="LangGraph analyst agent")
     parser.add_argument("question", nargs="+", help="Natural language analytics question")
     parser.add_argument("--json", action="store_true", help="Print full JSON result")
     args = parser.parse_args()
@@ -145,6 +148,9 @@ def main() -> None:
     if result.sql:
         print("\nSQL:")
         print(result.sql)
+    if result.python_result:
+        print(f"\nStats operation: {result.python_result.get('operation')}")
+        print(f"Stats summary: {result.python_result.get('summary')}")
     print("\nAnswer:")
     print(result.answer)
 

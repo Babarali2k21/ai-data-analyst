@@ -17,10 +17,11 @@ You are a strict QA critic for an autonomous data analyst.
 Pass only if:
 - There is no execution/validation error
 - The result is relevant to the question
-- Findings are grounded in the query result (no invented numbers)
+- Findings are grounded in the query/stats result (no invented numbers)
 - Empty results are acceptable only if that is a plausible true answer
 
-Fail with concrete, actionable feedback when SQL should be fixed or a different approach is needed.
+Fail with concrete, actionable feedback when SQL/stats should be fixed
+or a different approach is needed.
 """
 
 
@@ -31,6 +32,7 @@ def make_critic_node(llm: BaseChatModel) -> Any:
         error = (state.get("error") or "").strip()
         findings = (state.get("findings") or "").strip()
         query_result = state.get("query_result") or {}
+        python_result = state.get("python_result") or {}
 
         # Hard fail on tool errors / empty findings after an error
         if error:
@@ -56,6 +58,7 @@ def make_critic_node(llm: BaseChatModel) -> Any:
                         f"Plan:\n{state.get('plan')}\n\n"
                         f"SQL:\n{state.get('sql') or '(none)'}\n\n"
                         f"Result:\n{preview_query_result(query_result)}\n\n"
+                        f"Python/stats result:\n{python_result or '(none)'}\n\n"
                         f"Findings:\n{findings}\n"
                     )
                 ),
