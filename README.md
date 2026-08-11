@@ -1,6 +1,6 @@
 # AI Data Analyst
 
-Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–3** are in place: engineering setup, DuckDB analytics DB, LLM → SQL analyst, and a LangGraph agent (planner → router → SQL/Python → critic → finalizer).
+Production-style autonomous data analyst agent for the [Olist Brazilian e-commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). **Phases 0–4** are in place: setup, DuckDB, LLM→SQL, LangGraph agent, and Python/statistical tools.
 
 ## Stack
 
@@ -11,12 +11,9 @@ Production-style autonomous data analyst agent for the [Olist Brazilian e-commer
 | Analytical DB | DuckDB                             |
 | LLM           | OpenAI (`gpt-4.1-mini` default)    |
 | Agent         | LangGraph                          |
+| Stats         | Pandas (structured ops only)       |
 | Validation    | Pydantic                           |
 | Tests         | Pytest                             |
-| API (later)   | FastAPI                            |
-| UI (later)    | Next.js                            |
-
-**Model choice:** `gpt-4.1-mini` — strong at SQL/coding, Chat Completions compatible, cheap for eval loops.
 
 ## Setup
 
@@ -26,14 +23,16 @@ cp .env.example .env   # set OPENAI_API_KEY; LLM_MODEL=gpt-4.1-mini
 make ingest && make profile
 ```
 
-## Ask via LangGraph agent (Phase 3)
+## Ask via LangGraph agent
 
 ```bash
 uv run ask-agent "How many orders were delivered?"
-make ask-agent Q='What are the top 5 product categories by revenue?'
+uv run ask-agent "What is the correlation between item price and freight_value?"
 ```
 
-Flow: **Planner → Router → SQL analyst (Python stub) → Critic → Finalizer**, with replan on critic failure (max 3 iterations). Python stats tools arrive in Phase 4; if the planner picks Python today, the stub forces a SQL replan.
+Flow: **Planner → Router → SQL or Python analyst → Critic → Finalizer** (replan on failure, max 3 iterations).
+
+Python analyst: SQL fetch → fixed stats op (`describe`, `correlation`, `pct_change`, `rolling_mean`, `outliers`, `group_compare`) → NL findings. No arbitrary code execution.
 
 ## Phase 2 single-shot SQL
 
@@ -49,4 +48,4 @@ make lint && make typecheck && make test
 
 ## What's next
 
-Phase 4+: Python/statistical tools, richer critic recovery, visualization, evaluation, FastAPI, Next.js UI.
+Phase 5+: richer critic recovery, visualization, evaluation, FastAPI, Next.js UI.
