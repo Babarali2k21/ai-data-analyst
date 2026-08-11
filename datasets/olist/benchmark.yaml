@@ -1,0 +1,369 @@
+name: olist_v1
+version: "1"
+dataset: olist
+questions:
+  # ---- Easy: counts ----
+  - id: e01
+    question: How many orders are in the dataset?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 99441
+
+  - id: e02
+    question: How many customers are in the dataset?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 99441
+
+  - id: e03
+    question: How many sellers are in the dataset?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 3095
+
+  - id: e04
+    question: How many products are in the dataset?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 32951
+
+  - id: e05
+    question: How many order items are in the dataset?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 112650
+
+  - id: e06
+    question: How many orders have status delivered?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 96478
+    notes: Use order_status = 'delivered'
+
+  - id: e07
+    question: How many orders were canceled?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 625
+
+  - id: e08
+    question: How many payments used credit_card?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 76795
+
+  - id: e09
+    question: How many payments used boleto?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 19784
+
+  - id: e10
+    question: How many reviews have score 5?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 57328
+
+  # ---- Easy: averages ----
+  - id: e11
+    question: What is the average review score?
+    difficulty: easy
+    category: averages
+    expected_tool: sql
+    gold_numeric: 4.09
+    numeric_tolerance: 0.02
+
+  - id: e12
+    question: What is the average item price in order_items?
+    difficulty: easy
+    category: averages
+    expected_tool: sql
+    gold_numeric: 120.65
+    numeric_tolerance: 0.05
+
+  - id: e13
+    question: What is the average freight_value in order_items?
+    difficulty: easy
+    category: averages
+    expected_tool: sql
+    gold_numeric: 19.99
+    numeric_tolerance: 0.05
+
+  - id: e14
+    question: What is the average number of order items per order?
+    difficulty: easy
+    category: averages
+    expected_tool: sql
+    gold_numeric: 1.14
+    numeric_tolerance: 0.02
+
+  # ---- Easy: sorting ----
+  - id: e15
+    question: What is the maximum number of payment installments?
+    difficulty: easy
+    category: sorting
+    expected_tool: sql
+    gold_numeric: 24
+
+  - id: e16
+    question: Which seller_state has the most sellers?
+    difficulty: easy
+    category: sorting
+    expected_tool: sql
+    gold_contains: ["SP"]
+
+  - id: e17
+    question: How many customers are in state SP?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 41746
+
+  - id: e18
+    question: How many reviews have score 1?
+    difficulty: easy
+    category: counts
+    expected_tool: sql
+    gold_numeric: 11424
+
+  # ---- Medium: joins / grouping ----
+  - id: m01
+    question: What is the total revenue from order_items.price?
+    difficulty: medium
+    category: grouping
+    expected_tool: sql
+    gold_numeric: 13591643.7
+    numeric_tolerance: 1.0
+
+  - id: m02
+    question: Which product category has the highest total revenue?
+    difficulty: medium
+    category: joins
+    expected_tool: sql
+    gold_contains: ["health_beauty"]
+
+  - id: m03
+    question: What are the top 5 product categories by revenue?
+    difficulty: medium
+    category: joins
+    expected_tool: sql
+    gold_contains: ["health_beauty", "watches_gifts"]
+    require_judge: true
+
+  - id: m04
+    question: How many orders were placed in 2017?
+    difficulty: medium
+    category: time_analysis
+    expected_tool: sql
+    gold_numeric: 45101
+
+  - id: m05
+    question: How many orders were placed in 2018?
+    difficulty: medium
+    category: time_analysis
+    expected_tool: sql
+    gold_numeric: 54011
+
+  - id: m06
+    question: How many orders have more than one item?
+    difficulty: medium
+    category: grouping
+    expected_tool: sql
+    gold_numeric: 9803
+
+  - id: m07
+    question: How many orders were delivered later than the estimated delivery date?
+    difficulty: medium
+    category: comparisons
+    expected_tool: sql
+    gold_numeric: 7827
+
+  - id: m08
+    question: What is the most common payment_type?
+    difficulty: medium
+    category: grouping
+    expected_tool: sql
+    gold_contains: ["credit_card"]
+
+  - id: m09
+    question: Which customer_state has the most customers?
+    difficulty: medium
+    category: grouping
+    expected_tool: sql
+    gold_contains: ["SP"]
+
+  - id: m10
+    question: What is the average payment_value for credit_card payments?
+    difficulty: medium
+    category: averages
+    expected_tool: sql
+    require_judge: true
+    notes: Judge against query result; no fixed gold numeric in suite
+
+  - id: m11
+    question: How many distinct product categories are there in products?
+    difficulty: medium
+    category: counts
+    expected_tool: sql
+    require_judge: true
+
+  - id: m12
+    question: What month had the most orders in 2017?
+    difficulty: medium
+    category: time_analysis
+    expected_tool: sql
+    require_judge: true
+
+  - id: m13
+    question: Compare the number of delivered vs canceled orders.
+    difficulty: medium
+    category: comparisons
+    expected_tool: sql
+    gold_contains: ["96478", "625"]
+    require_judge: true
+
+  - id: m14
+    question: What is the average review score for delivered orders?
+    difficulty: medium
+    category: joins
+    expected_tool: sql
+    require_judge: true
+
+  - id: m15
+    question: Which payment_type has the highest average payment_value?
+    difficulty: medium
+    category: grouping
+    expected_tool: sql
+    require_judge: true
+
+  - id: m16
+    question: How many order reviews have a non-empty comment message?
+    difficulty: medium
+    category: counts
+    expected_tool: sql
+    require_judge: true
+
+  # ---- Hard: multi-step / stats / ambiguous ----
+  - id: h01
+    question: What is the correlation between item price and freight_value?
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: python
+    gold_numeric: 0.414
+    numeric_tolerance: 0.05
+    notes: Population/sample corr may differ slightly by method/filter
+
+  - id: h02
+    question: Describe the distribution of item prices (mean, median, std).
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: python
+    require_judge: true
+
+  - id: h03
+    question: Are there outliers in freight_value using the IQR method?
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: python
+    require_judge: true
+
+  - id: h04
+    question: Compare average item price by customer_state for the top 5 states by order volume.
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: either
+    require_judge: true
+
+  - id: h05
+    question: What percentage of orders were delivered late versus on time or early?
+    difficulty: hard
+    category: multi_step
+    expected_tool: sql
+    require_judge: true
+
+  - id: h06
+    question: Is monthly order volume increasing through 2017?
+    difficulty: hard
+    category: time_analysis
+    expected_tool: either
+    require_judge: true
+
+  - id: h07
+    question: Which product categories have the worst average review scores?
+    difficulty: hard
+    category: root_cause
+    expected_tool: sql
+    require_judge: true
+
+  - id: h08
+    question: Do higher freight values correlate with lower review scores?
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: python
+    require_judge: true
+
+  - id: h09
+    question: Why might some orders be canceled? Summarize cancel volume and any related patterns you can measure.
+    difficulty: hard
+    category: root_cause
+    expected_tool: either
+    require_judge: true
+
+  - id: h10
+    question: What share of revenue comes from the top 10 product categories?
+    difficulty: hard
+    category: multi_step
+    expected_tool: sql
+    require_judge: true
+
+  - id: h11
+    question: How does average delivery delay differ across customer states?
+    difficulty: hard
+    category: comparisons
+    expected_tool: sql
+    require_judge: true
+
+  - id: h12
+    question: Find orders with unusually high payment_value outliers and report how many there are.
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: python
+    require_judge: true
+
+  - id: h13
+    question: Something seems off with delivery performance — investigate late deliveries and review scores.
+    difficulty: hard
+    category: ambiguous
+    expected_tool: either
+    require_judge: true
+
+  - id: h14
+    question: Compute rolling 3-month average order counts over time.
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: python
+    require_judge: true
+
+  - id: h15
+    question: Compare mean and median payment_value. Is the distribution skewed?
+    difficulty: hard
+    category: statistical_analysis
+    expected_tool: python
+    require_judge: true
+
+  - id: h16
+    question: Roughly how big is this business? Give a concise KPI snapshot.
+    difficulty: hard
+    category: ambiguous
+    expected_tool: either
+    require_judge: true
